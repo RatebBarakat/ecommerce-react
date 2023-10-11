@@ -1,0 +1,11 @@
+td,th {
+    padding: 10px;
+}
+
+table {
+    text-align: center;
+}
+
+.table-responsive {
+    display: flex;
+}

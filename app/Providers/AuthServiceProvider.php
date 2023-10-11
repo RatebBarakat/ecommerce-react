@@ -2,18 +2,24 @@
 
 namespace App\Providers;
 
-// use Illuminate\Support\Facades\Gate;
+use App\Models\Permission;
+use App\Models\Role;
+use App\Models\User;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
     /**
-     * The model to policy mappings for the application.
+     * The policy mappings for the application.
      *
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        //
+        // 'App\Models\Model' => 'App\Policies\ModelPolicy',
     ];
 
     /**
@@ -21,6 +27,34 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        $this->registerPolicies();
+
+        try {
+            ResetPassword::createUrlUsing(function (User $user, string $token) {
+                return config('app.frontend_url').'/password-reset?token='.$token.'&email='.$user->email;
+            });
+        } catch (\Throwable $th) {
+            Log::error($th->getMessage());
+        }
+
+        $permissions = Cache::remember('permissions',60 * 60,function() {
+            return Permission::get();
+        });
+        $roles = Cache::remember('roles',60 * 60,function() {
+            return Role::get();
+        });
+    
+        foreach ($permissions as $permission) {
+            Gate::define($permission->slug, function ($user) use ($permission) {
+                return $user->hasPermission($permission->slug);
+            });            
+        }
+
+        foreach ($roles as $role) {
+            Gate::define($role->slug, function ($user) use ($role) {
+                return $user->hasRole($role->slug);
+            });            
+        }
+
     }
 }
