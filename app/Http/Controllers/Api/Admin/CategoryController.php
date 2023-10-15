@@ -18,7 +18,7 @@ class CategoryController extends Controller
     public function index()
     {
         if (Gate::denies("read-categories")) abort(403,'you cannt read categories');
-        return CategoryResource::collection(Category::get());
+        return CategoryResource::collection(Category::paginate(10));
     }
 
     public function store(CreateCategoryRequest $createCategoryRequest)
