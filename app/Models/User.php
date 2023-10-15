@@ -45,6 +45,12 @@ class User extends Authenticatable implements MustVerifyEmail,CanResetPassword
         return $this->role && $this->role->permissions->contains('slug', $slug);
     }
 
+    public function profile() {
+        return $this->hasOne(Profile::class)->withDefault([
+            'user_id' => $this->id,
+        ]);
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
