@@ -7,13 +7,14 @@ import router from './router.jsx';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "../public/css/table.css";
-import "tw-elements-react/dist/css/tw-elements-react.min.css";
+import { ProfileProvider } from './contexts/profile';
 
 ReactDOM.render(
   <React.StrictMode>
     <AuthProvider>
-      <ToastContainer />
+      <ProfileProvider>
       <RouterProvider router={router} />
+      </ProfileProvider>
     </AuthProvider>
   </React.StrictMode>,
   document.getElementById('root')

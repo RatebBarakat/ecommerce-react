@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Admin\CategoryController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\Role;
 use App\Models\User;
@@ -34,4 +35,9 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     ]);
 });
 
-Route::apiResource('category',CategoryController::class);
+Route::middleware(['auth:sanctum','verified'])->group(function() {
+    Route::apiResource('category',CategoryController::class);
+    Route::get('/profile',[ProfileController::class,'show']);
+    Route::post('/profile',[ProfileController::class,'update']);
+
+});

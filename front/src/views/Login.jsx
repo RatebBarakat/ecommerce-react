@@ -4,9 +4,11 @@ import GuestLayout from '../layouts/GuestLayout';
 import { AuthContext } from '../contexts/auth';
 import axios from '../axios';
 import Cookies from 'js-cookie';
+import { ProfileContext } from '../contexts/profile';
 
 const Login = () => {
     const authContext = useContext(AuthContext);
+    const profileContext = useContext(ProfileContext);
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [processing, setProcessing] = useState(false);
@@ -26,6 +28,7 @@ const Login = () => {
                 email: email, password: password
             });
             await authContext.fetchUser();
+            await profileContext.fetchProfile();
             navigate('/user/dashboard');
         } catch (error) {
             console.log('error :>> ', error);

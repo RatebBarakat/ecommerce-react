@@ -10,6 +10,8 @@ import VerifyEmail from "./views/VerifyEmail";
 import ForgotPassword from "./views/ForgotPassword";
 import ResetPassword from "./views/ResetPassword";
 import Categories from "./views/admin/category";
+import Profile from "./views/admin/profile";
+import Dashboard from "./views/admin/dashboard";
 
 const router = createBrowserRouter([
     {
@@ -44,7 +46,15 @@ const router = createBrowserRouter([
         children: [
             {
                 path: 'dashboard',
+                element: <Dashboard />
+            },
+            {
+                path: 'categories',
                 element: <Categories />
+            },
+            {
+                path: 'profile',
+                element: <Profile />
             },
             {
                 path: 'verify',
