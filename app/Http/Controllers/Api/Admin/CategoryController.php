@@ -15,10 +15,21 @@ use Illuminate\Support\Facades\Gate;
 class CategoryController extends Controller
 {
     use ApiResponse;
+
+    public function deleteMany(Request $request){
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:categories,id'
+        ]);
+
+        Category::query()->whereIn('id',$request->ids)->delete();
+        
+        return $this->successResponse(message:'categories deleted successfully');
+    }
     public function index()
     {
         if (Gate::denies("read-categories")) abort(403,'you cannt read categories');
-        return CategoryResource::collection(Category::paginate(10));
+        return CategoryResource::collection(Category::orderBy('id','desc')->paginate(10));
     }
 
     public function store(CreateCategoryRequest $createCategoryRequest)
