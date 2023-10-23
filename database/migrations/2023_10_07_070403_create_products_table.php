@@ -19,8 +19,7 @@ return new class extends Migration
             $table->longText('description');
             $table->double('price');
             $table->integer('quantity');
-            $table->json('images');
-            $table->foreignId('category_id')->index()->constrained('categories');
+            $table->foreignId('category_id')->index()->constrained('categories')->cascadeOnDelete();
             $table->timestamps();
         });
     }
