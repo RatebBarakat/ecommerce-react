@@ -1,4 +1,4 @@
-td,th {
+th {
     padding: 10px;
 }
 
@@ -8,4 +8,6 @@ table {
 
 .table-responsive {
     display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
