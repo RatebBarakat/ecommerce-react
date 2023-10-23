@@ -7,7 +7,7 @@ import Loading from '../components/Loading';
 export default function GuestLayout() {
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
-
+    
     return (
         auth.isLoading ?<Loading centered={true}  size={'large'} /> :
         auth.user ? <Navigate to='/user/dashboard' /> :<Outlet />

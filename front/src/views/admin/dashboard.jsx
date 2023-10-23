@@ -13,6 +13,14 @@ export default function Dashboard() {
           </div>
         </Link>
       </div>
+      <div className="container mx-auto grid grid-cols-1 border
+       hover:shadow-lg md:!grid-cols-2 lg:!grid-cols-4 gap-6">
+        <Link to="/user/products" className="dashboard-link">
+          <div className="dashboard-link-content">
+            <span className="dashboard-link-text">products</span>
+          </div>
+        </Link>
+      </div>
     </>
   );
 }

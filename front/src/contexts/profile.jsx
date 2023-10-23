@@ -1,11 +1,13 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "../axios";
+import createAxiosInstance from "../axios";
 
 const ProfileContext = createContext();
 
 const ProfileProvider = ({ children }) => {
   const [profile, setProfile] = useState({});
   const [isProfileLoading, setIsProfileLoading] = useState(true);
+  const axios = createAxiosInstance();
 
   const fetchProfile = async () => {
     !isProfileLoading && setIsProfileLoading(true);

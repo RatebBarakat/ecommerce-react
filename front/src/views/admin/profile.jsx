@@ -12,6 +12,8 @@ export default function Profile() {
   const [isLoading, setIsLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [errors,setErrors] = useState([]);
+  const auth = useContext(AuthContext);
+  const axios = createAxiosInstance(auth);
   const [profile, setProfile] = useState({
     postal_code: null,
     country: null,

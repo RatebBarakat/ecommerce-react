@@ -1,14 +1,16 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "../axios";
 import Cookies from "js-cookie";
+import createAxiosInstance from "../axios";
 
-const AuthContext = createContext();
+const AuthContext = createContext({});
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isVerified, setIsVerified] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [permissions, setPermissions] = useState({});
+  const axios = createAxiosInstance();
 
   const fetchUser = async () => {
     !isLoading && setIsLoading(true);
@@ -49,4 +51,6 @@ const AuthProvider = ({ children }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export { AuthProvider, AuthContext };
+const useAuth = () => useContext(AuthContext);
+
+export { AuthProvider, AuthContext, useAuth };

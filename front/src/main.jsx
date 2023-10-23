@@ -8,11 +8,13 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "../public/css/table.css";
 import { ProfileProvider } from './contexts/profile';
+import 'react-toastify/dist/ReactToastify.css';
 
 ReactDOM.render(
   <React.StrictMode>
     <AuthProvider>
       <ProfileProvider>
+        <ToastContainer />
       <RouterProvider router={router} />
       </ProfileProvider>
     </AuthProvider>

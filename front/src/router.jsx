@@ -12,6 +12,9 @@ import ResetPassword from "./views/ResetPassword";
 import Categories from "./views/admin/category";
 import Profile from "./views/admin/profile";
 import Dashboard from "./views/admin/dashboard";
+import Products from "./views/admin/product";
+import CreateProduct from "./views/admin/product/create";
+import Updateproduct from "./views/admin/product/update";
 
 const router = createBrowserRouter([
     {
@@ -51,6 +54,18 @@ const router = createBrowserRouter([
             {
                 path: 'categories',
                 element: <Categories />
+            },
+            {
+                path: 'products',
+                element: <Products />
+            },
+            {
+                path: 'products/create',
+                element: <CreateProduct />
+            },
+            {
+                path: 'products/edit/:id',
+                element: <Updateproduct />
             },
             {
                 path: 'profile',

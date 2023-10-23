@@ -2,12 +2,13 @@ import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import GuestLayout from '../layouts/GuestLayout';
 import { AuthContext } from '../contexts/auth';
-import axios from '../axios';
 import Cookies from 'js-cookie';
 import { ProfileContext } from '../contexts/profile';
+import createAxiosInstance from '../axios';
 
 const Login = () => {
     const authContext = useContext(AuthContext);
+    const axios = createAxiosInstance(authContext);
     const profileContext = useContext(ProfileContext);
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
@@ -93,7 +94,7 @@ const Login = () => {
                             type="submit"
                             className={`group relative w-full flex justify-center py-2 px-4 border 
         ${processing ? 'bg-indigo-300 cursor-not-allowed' :
-                                    'border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+                                    'border-transparent text-sm font-medium rounded-md text-white !bg-indigo-600 hover:!bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
                                 }`}
                         >
                             {!processing ? 'login' : 'processing'}

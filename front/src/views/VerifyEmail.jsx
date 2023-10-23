@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import axios from '../axios';  // Import your axios instance
 import { useContext } from 'react';
 import { AuthContext } from '../contexts/auth';
 import { useNavigate } from 'react-router-dom';
+import createAxiosInstance from '../axios';
 
 const VerifyEmail = () => {
   const [resendLoading, setResendLoading] = useState(false);
   const auth = useContext(AuthContext);
+  const axios = createAxiosInstance(auth);
   const navigate = useNavigate();
 
   useEffect(() => {

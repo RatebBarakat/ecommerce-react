@@ -2,7 +2,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../../contexts/auth";
 import Loading from "../../../components/Loading";
-import axios from "../../../axios";
 import Modal from "../../../components/Modal";
 import { useNavigate } from "react-router-dom";
 import Toast from "../../../components/Toast";
@@ -12,8 +11,11 @@ import { formToJSON } from "axios";
 import Pagination from "../../../components/Pagination";
 import ReactPaginate from "react-paginate";
 import "tw-elements-react/dist/css/tw-elements-react.min.css";
+import Table from "../../../components/Table";
+import createAxiosInstance from "../../../axios";
 
 const Categories = () => {
+  const axios = createAxiosInstance();
   const auth = useContext(AuthContext);
   const [categories, setCategories] = useState([]);
   const [selected, setSelected] = useState([]);
@@ -40,9 +42,6 @@ const Categories = () => {
     name: "",
     slug: "",
   });
-
-  const numberOfCategoriesVisited = page * perPage;
-  const totalPages = Math.ceil(categories.length / perPage);
 
   const changePage = ({ selected }) => {
     const newPage = selected + 1;
@@ -90,6 +89,7 @@ const Categories = () => {
       .post(`/api/category`, form)
       .then((response) => {
         fetchCategories(1);
+        resetInputs("add");
         setPage(1);
         toggleModal();
         Toast.notifyMessage("success", "category added");
@@ -97,9 +97,6 @@ const Categories = () => {
       .catch((error) => {
         const addErrors = ErrorHelper.extractErrorMessage(error);
         setErrors({ add: addErrors, edit: {} });
-      })
-      .finally(() => {
-        resetInputs("add");
       });
   };
 
@@ -120,16 +117,14 @@ const Categories = () => {
     axios
       .put(`/api/category/${editForm.id}`, editForm)
       .then((response) => {
-        fetchCategories();
+        fetchCategories(page);
+        resetInputs("edit");
         toggleEditModal();
         Toast.notifyMessage("success", "category updated");
       })
       .catch((error) => {
         const editErrors = ErrorHelper.extractErrorMessage(error);
         setErrors({ edit: editErrors, add: {} });
-      })
-      .finally(() => {
-        resetInputs("edit");
       });
   };
 
@@ -155,20 +150,19 @@ const Categories = () => {
     if (!confirm("are you sure you want to delete selected categories")) {
       return;
     }
-    console.log('selected :>> ', selected);
-    // axios
-    //   .delete(`/api/category/${id}`)
-    //   .then((response) => {
-    //     fetchCategories(1);
-    //     Toast.notifyMessage("success", "category delted");
-    //   })
-    //   .catch((error) => {
-    //     Toast.notifyMessage(
-    //       "error",
-    //       error.response?.data?.message,
-    //       toString() ?? "cant delete"
-    //     );
-    //   });
+    axios
+      .post(`/api/category/deleteMany`, { ids: Array.from(selected) })
+      .then((response) => {
+        fetchCategories(1);
+        Toast.notifyMessage("success", "category delted");
+      })
+      .catch((error) => {
+        Toast.notifyMessage(
+          "error",
+          error.response?.data?.message,
+          toString() ?? "cant delete"
+        );
+      });
   };
 
   const handleSelectAll = (event) => {
@@ -228,134 +222,45 @@ const Categories = () => {
       return navigate("/");
     } else {
       let params = new URLSearchParams(location.search);
-      fetchCategories(page);
+      params.get("page") ? fetchCategories(page) : fetchCategories();
     }
   }, [auth.permissions]);
 
+  const columns = [
+    { title: "Name", dataField: "name" },
+    { title: "Slug", dataField: "slug" },
+  ];
+
   return (
     <>
-      <div className="container lg:!w-3/4 mx-auto">
+      <div className="container w-screen sm:!w-11/12 mx-auto">
         <div className="flex justify-between">
-        <button
-          className="inline-block ml-3 rounded mt-3 bg-indigo-600 px-6 pb-2 pt-2.5 text-base font-medium leading-normal text-white"
-          onClick={toggleModal}
-        >
-          Add Category
-        </button>
-        {selected.length > 0 && (
-            <button onClick={(event) => handleDeleteMany()}>delete selected</button>
+          <button
+            className="inline-block ml-3 rounded mt-3 bg-indigo-600 px-6 pb-2 pt-2.5 text-base font-medium leading-normal text-white"
+            onClick={toggleModal}
+          >
+            Add Category
+          </button>
+          {selected.length > 0 && (
+            <button onClick={(event) => handleDeleteMany()}>
+              delete selected
+            </button>
           )}
         </div>
-        <div className="table-responsive m-3">
-          <table className="table mt-4 w-full border">
-            <thead className="bg-indigo-600 text-white">
-              <tr>
-                <th className="py-2 px-4">
-                  <input
-                    type="checkbox"
-                    className="accent-indigo-500"
-                    checked={selected.length === categories.length}
-                    onChange={handleSelectAll}
-                  />{" "}
-                </th>
-                <th className="py-2 px-4">Name</th>
-                <th className="py-2 px-4">Slug</th>
-                <th className="py-2 px-4">Actions</th>
-              </tr>
-            </thead>
-            {isLoading ? (
-              <tbody>
-                <tr>
-                  <td colspan="3">
-                    <div className="flex items-center justify-center h-full">
-                      <Loading centered={false} size="small" />
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            ) : (
-              <tbody>
-                {categories.length === 0 ? (
-                  <tr>
-                    <td className="p-2" colSpan="3">
-                      No categories
-                    </td>
-                  </tr>
-                ) : (
-                  categories.map((category) => (
-                    <tr key={category.id}>
-                      <td className="py-3 px-4">
-                        <input
-                          type="checkbox"
-                          className="accent-indigo-500"
-                          value={category.id}
-                          checked={isSelected(category.id)}
-                          onChange={handleCheckboxChange}
-                        />{" "}
-                      </td>
-                      <td className="py-3 px-4">{category.name}</td>
-                      <td className="py-3 px-4">{category.slug}</td>
-                      <td className="py-3 px-4">
-                        {auth.permissions.includes("update-categories") && (
-                          <button
-                            onClick={() => openEditForm(category.id)}
-                            className="
-                          text-sm font-normal text-green-700 hover:text-white
-                           border border-green-700 hover:bg-green-800 focus:ring-4 
-                           focus:outline-none focus:ring-green-300 
-                           rounded-lg px-5 py-2.5 text-center mr-2 mb-2
-                            dark:border-green-500 dark:text-green-500
-                             dark:hover:text-white dark:hover:bg-green-500
-                              dark:focus:ring-green-800"
-                          >
-                            Edit
-                          </button>
-                        )}
-                        {auth.permissions.includes("delete-categories") && (
-                          <button
-                            onClick={() => handleDelete(category.id)}
-                            className="
-                          text-sm font-normal text-red-700 hover:text-white
-                           border border-red-700 hover:bg-red-800 focus:ring-4 
-                           focus:outline-none focus:ring-red-300 
-                           rounded-lg px-5 py-2.5 text-center mr-2 mb-2checkbo
-                            dark:border-red-500 dark:text-red-500
-                             dark:hover:text-white dark:hover:bg-red-500
-                              dark:focus:ring-red-800"
-                          >
-                            Delete
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            )}
-          </table>
-        </div>
+        <Table
+          columns={columns}
+          data={categories}
+          selected={selected}
+          canEdit="update-categories"
+          canDelete="delete-categories"
+          handleEdit={openEditForm}
+          handleDelete={handleDelete}
+          handleCheckboxChange={handleCheckboxChange}
+          handleSelectAll={handleSelectAll}
+          isSelected={isSelected}
+          isLoading={isLoading}
+        />
         {Object.keys(links).length > 0 && (
-          // <ReactPaginate
-          //   pageCount={numberofPages}
-          //   initialPage={0}
-          //   forcePage={page - 1}
-          //   pageRangeDisplayed={2}
-          //   marginPagesDisplayed={3}
-          //   onPageChange={changePage}
-          //   containerClassName={"flex my-6"}
-          //   activeClassName={"bg-indigo-600 text-white px-4 py-2 rounded"}
-          //   pageClassName={"px-4 py-2"}
-          //   previousLinkClassName={`mr-2 px-4 py-2 ${
-          //     page <= 1 ? "!cursor-not-allowed" : ""
-          //   }`}
-          //   nextLinkClassName={`ml-2 px-4 py-2 ${
-          //     page >= numberofPages ? "!cursor-not-allowed" : ""
-          //   }`}
-          //   breakClassName={"mx-2 px-4 py-2"}
-          //   previousLabel={"Previous"}
-          //   nextLabel={"Next"}
-          //   disableInitialCallback={true}
-          // />
           <Pagination
             page={page}
             numberofPages={numberofPages}
@@ -395,6 +300,7 @@ const Categories = () => {
         showModal={showEditModal}
         toggleModal={toggleEditModal}
         onSubmit={handleEditSubmit}
+        errors={errors.edit}
       >
         <Input
           label="name"

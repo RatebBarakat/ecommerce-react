@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
-import axios from '../axios';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Toast from '../components/Toast';
+import { AuthContext } from '../contexts/auth';
+import createAxiosInstance from '../axios';
 
 const ResetPassword = () => {
     const [password, setPassword] = useState('');
     const [passwordConf, setPasswordConf] = useState('');
     const navigate = useNavigate();
+    const auth = useContext(AuthContext);
+    const axios = createAxiosInstance(auth);
 
     const handlePasswordChange = (event) => {
         setPassword(event.target.value);

@@ -3,10 +3,11 @@ import { AuthContext } from "../contexts/auth";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Loading from "../components/Loading";
 import axios from "../axios";
+import createAxiosInstance from "../axios";
 export default function Home() {
     const auth = useContext(AuthContext);
     const navigate = useNavigate();
-
+    const axios = createAxiosInstance(auth);
 
     const [users, setUsers] = useState({});
     const [isLoading, setIsLoading] = useState(true);
