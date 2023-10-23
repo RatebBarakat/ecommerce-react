@@ -58,7 +58,7 @@ const Modal = ({ header, errors, identifier, showModal, toggleModal, onSubmit, c
               <TERipple rippleColor="light">
                 <button
                   type="button"
-                  className="inline-block rounded bg-primary-100 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-primary-700 transition duration-150 ease-in-out hover:bg-primary-accent-100 focus:bg-primary-accent-100 focus:outline-none focus:ring-0 active:bg-primary-accent-200"
+                  className="inline-block rounded bg-indigo-100 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-indigo-700 transition duration-150 ease-in-out hover:bg-indigo-accent-100 focus:bg-indigo-accent-100 focus:outline-none focus:ring-0 active:bg-indigo-accent-200"
                   onClick={() => toggleModal(false)}
                 >
                   Close
@@ -67,7 +67,10 @@ const Modal = ({ header, errors, identifier, showModal, toggleModal, onSubmit, c
               <TERipple rippleColor="light">
                 <button
                   type="button"
-                  className="ml-1 inline-block rounded bg-primary px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]"
+                  className="ml-1 inline-block rounded bg-indigo px-6 pb-2 pt-2.5 text-xs
+                   font-medium uppercase leading-normal text-indigo-600 border border-indigo-600 
+                   transition duration-150 ease-in-out hover:text-white
+                    hover:bg-indigo-600"
                   onClick={handleSubmit}
                 >
                   Save changes
