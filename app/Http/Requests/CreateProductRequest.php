@@ -32,6 +32,7 @@ class CreateProductRequest extends FormRequest
             'price' => 'numeric|min:1',
             'quantity' => 'numeric|min:1',
             'category_id' => 'integer|exists:categories,id',
+            'tags' => 'required|array',
         ];
     }
 }

@@ -90,9 +90,11 @@ class ProductController extends Controller
     public function store(CreateProductRequest $createProductRequest)
     {
         $validatedData = $createProductRequest->validated();
-        if ($validatedData['images']) unset($validatedData['images']);
-
+        unset($validatedData['images'],$validatedData['tags']);
+        
         $product = Product::create($validatedData);
+
+        $product->tags()->sync($createProductRequest->tags);
 
         $images = $createProductRequest->file('images');
 
