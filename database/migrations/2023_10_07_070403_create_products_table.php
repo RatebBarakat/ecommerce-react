@@ -19,7 +19,7 @@ return new class extends Migration
             $table->longText('description');
             $table->double('price');
             $table->integer('quantity');
-            $table->foreignId('category_id')->index()->constrained('categories')->cascadeOnDelete();
+            $table->foreignId('category_id')->index()->nullable()->constrained('categories')->nullOnDelete();
             $table->timestamps();
         });
     }
