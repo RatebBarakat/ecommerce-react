@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Input } from "../../components/input";
-import axios from "../../axios";
 import Toast from "../../components/Toast";
 import ErrorHelper from "../../helpers/errors";
 import Loading from "../../components/Loading";
 import { AuthContext } from "../../contexts/auth";
 import { ProfileContext } from "../../contexts/profile";
+import createAxiosInstance from "../../axios";
 
 export default function Profile() {
   const [selectedFile, setSelectedFile] = useState();

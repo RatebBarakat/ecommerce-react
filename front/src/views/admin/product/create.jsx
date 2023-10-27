@@ -1,15 +1,22 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import Loading from "../../../components/Loading";
 import { Input } from "../../../components/input";
 import createAxiosInstance from "../../../axios";
 import { AuthContext } from "../../../contexts/auth";
+import { useNavigate } from "react-router-dom";
+import Select from "react-select";
+import ErrorHelper from "../../../helpers/errors";
 
 export default function CreateProduct() {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [categories, setCategories] = useState([]);
   const auth = useContext(AuthContext);
+  const [tags, setTags] = useState([]);
   const axios = createAxiosInstance(auth);
-
+  const navigate = useNavigate();
+  const [tagSuggestions, setTagSuggestions] = useState([]); // Store tag suggestions based on name
   const [product, setProduct] = useState({
     name: "",
     slug: "",
@@ -18,8 +25,27 @@ export default function CreateProduct() {
     price: "",
     quantity: "",
     images: [],
-    category_id: 1,
+    category_id: 0,
+    tags: [], // Store tag IDs here
   });
+
+  useEffect(() => {
+    axios
+      .get("api/category?type=all")
+      .then((response) => {
+        setCategories(response.data.data);
+        axios.get("/api/tag").then((response) => {
+          const tagsFromResponse = response.data.data.map((tag) => ({
+            value: tag.id,
+            label: tag.name,
+          }));
+          setTagSuggestions(tagsFromResponse);
+        });
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
 
   useEffect(() => {
     setProduct({ ...product, slug: product.name.replace(/\s+/g, "-") });
@@ -31,12 +57,20 @@ export default function CreateProduct() {
 
   const [errors, setErrors] = useState([]);
 
+  const handleTagChange = (selectedOptions) => {
+    setProduct({
+      ...product,
+      tags: selectedOptions,
+    });
+  };
+
   const handleSubmission = async (event) => {
     event.preventDefault();
     const formData = new FormData();
 
+
     for (const key in product) {
-      if (key !== "images") {
+      if (key !== "images" && key !== "tags") {
         formData.append(key, product[key]);
       }
     }
@@ -47,17 +81,33 @@ export default function CreateProduct() {
       });
     }
 
+    if (product.tags) {
+      Array.from(product.tags).map((image) => {
+        formData.append("tags[]", image.value);
+      });
+    }
+
     axios
       .post("/api/product", formData, {
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setProgress(percentCompleted);
+        },
         headers: {
           "Content-Type": "multipart/form-data",
         },
       })
       .then((response) => {
-        console.log("response :>> ", response);
+        navigate("/user/products");
       })
       .catch((error) => {
-        console.log("error :>> ", error);
+        let errorFromRequest = ErrorHelper.extractErrorMessage(error);
+        errorFromRequest && setErrors(errorFromRequest);
+      })
+      .finally(() => {
+        setProgress(0);
       });
   };
 
@@ -143,22 +193,82 @@ export default function CreateProduct() {
             error={errors?.quantity || null}
             placeholder="quantity"
           />
+          <div>
+            <label
+              htmlFor="tags"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Select tags
+            </label>
+            <Select
+              isMulti
+              options={tagSuggestions}
+              value={product.tags}
+              onChange={handleTagChange}
+              styles={{
+                control: (styles) => ({
+                  ...styles,
+                  borderRadius: "0.375rem",
+                  border: "1px solid #D1D5DB",
+                }),
+                multiValue: (styles) => ({
+                  ...styles,
+                  borderRadius: "0.375rem",
+                }),
+              }}
+            />
+          </div>
+          <div>
+            <label
+              for="categories"
+              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Select a category
+            </label>
+            <select
+              value={product.category_id}
+              onChange={(event) =>
+                setProduct({ ...product, category_id: event.target.value })
+              }
+              id="categories"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            >
+              <option selected>Choose a category</option>
+              {categories &&
+                categories.map((cat) => (
+                  <option value={cat.id}>{cat.name}</option>
+                ))}
+            </select>
+          </div>
           <Input
             label="avatar"
             type="file"
             name="file"
             multiple={true}
             error={errors?.avatar || null}
-            onChange={(event) => handleFileUpload(event)}
+            onChange={handleFileUpload}
             style={{ gridColumnStart: "1", gridColumnEnd: "3" }}
           />
+
+          {progress !== 0 && (
+            <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+              <div
+                className="bg-indigo-600 h-2.5 rounded-full"
+                style={{
+                  width: `${progress}%`,
+                  gridColumnStart: "1",
+                  gridColumnEnd: "3",
+                }}
+              ></div>
+            </div>
+          )}
           <button
-            disabled={processing}
+            disabled={processing || progress !== 0}
             className="group disabled:cursor-not-allowed disabled:!bg-indigo-400 relative py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white !bg-indigo-600 hover:!bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             type="submit"
             style={{ gridColumnStart: "1", gridColumnEnd: "3" }}
           >
-            update product
+            Update Product
           </button>
         </form>
       )}
