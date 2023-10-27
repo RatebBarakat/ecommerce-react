@@ -27,11 +27,10 @@ class UpdateProductRequest extends FormRequest
             'slug' => 'required|string|min:2',
             'small_description' => 'required|string|min:20',
             'description' => 'required|string|min:25',
-            'images' => 'nullable|array|min:1|max:5',
-            'images.*' => 'required|image',
             'price' => 'required|numeric|min:1',
             'quantity' => 'required|numeric|min:1',
             'category_id' => 'required|integer|exists:categories,id',
+            'tags' => 'required|array',
         ];
     }
 }

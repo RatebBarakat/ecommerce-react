@@ -28,7 +28,7 @@ class CreateProductRequest extends FormRequest
             'small_description' => 'required|string|min:20|max:150',
             'description' => 'required|string|min:25|max:2000',
             'images' => 'required|array|min:1|max:5',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', 
+            'images.*' => 'required|mimes:jpeg,png,jpg,gif|max:2048', 
             'price' => 'numeric|min:1',
             'quantity' => 'numeric|min:1',
             'category_id' => 'integer|exists:categories,id',

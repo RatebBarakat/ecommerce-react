@@ -9,36 +9,47 @@ use App\Http\Requests\UpdateCategoryRequest;
 use App\Http\Resources\CategoryResource;
 use App\Http\Traits\ApiResponse;
 use App\Models\Category;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 
 class CategoryController extends Controller
 {
     use ApiResponse;
 
-    public function deleteMany(Request $request){
+    public function deleteMany(Request $request)
+    {
         $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'exists:categories,id'
         ]);
 
-        Category::query()->whereIn('id',$request->ids)->delete();
-        
-        return $this->successResponse(message:'categories deleted successfully');
+        Category::query()->whereIn('id', $request->ids)->delete();
+
+        return $this->successResponse(message: 'categories deleted successfully');
     }
+    
     public function index()
     {
-        if (Gate::denies("read-categories")) abort(403,'you cannt read categories');
-        return CategoryResource::collection(Category::orderBy('id','desc')->paginate(10));
+        if (Gate::denies("read-categories")) abort(403, 'you cannt read categories');
+        return CategoryResource::collection(
+            request()->get('type') === "all" ?
+                Cache::remember('categories', Carbon::now()->addDay(), function () {
+                    return Category::orderBy('id', 'desc')->get(['id', 'name']);
+                })
+                : Category::orderBy('id', 'desc')->paginate(10)
+        );
     }
 
     public function store(CreateCategoryRequest $createCategoryRequest)
     {
         Category::create($createCategoryRequest->validated());
-        return $this->successResponse(message : 'category created successfully');
+        return $this->successResponse(message: 'category created successfully');
     }
 
-    public function show(int $id){
+    public function show(int $id)
+    {
         $category = Category::findOrFail($id);
         return CategoryResource::make($category);
     }
@@ -47,12 +58,13 @@ class CategoryController extends Controller
     {
         Category::findOrFail($updateCategoryRequest->input('id'))
             ->update($updateCategoryRequest->validated());
-            return $this->successResponse(message : 'category updated successfully');
+        return $this->successResponse(message: 'category updated successfully');
     }
 
-    public function destroy(Request $request,Category $category) {
-        abort_if(Gate::denies('delete-categories'),403);
+    public function destroy(Request $request, Category $category)
+    {
+        abort_if(Gate::denies('delete-categories'), 403);
         $category->delete();
-        return $this->successResponse(message : 'category deleted successfully');
+        return $this->successResponse(message: 'category deleted successfully');
     }
 }

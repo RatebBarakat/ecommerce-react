@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,6 +15,9 @@ class ProductResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $this->load("media");
+        $this->load("tags");
+        
         $images = [];
         $media = $this->getMedia('images');
 
@@ -37,8 +41,10 @@ class ProductResource extends JsonResource
             'images' => $images ? ($request->routeIs('product.index') ?
                 $images[0] : $images) : null,
             'category' => [
+                'id' => $category->id,
                 'name' => $category->name
-            ]
+            ],
+            'tags' => TagResource::collection($this->tags),
         ];
     }
 }

@@ -19,7 +19,7 @@ class Product extends Model implements HasMedia
 
     public function tags()
     {
-        return $this->belongsToMany(Tags::class, 'tag_taggable', 'tag_id');
+        return $this->belongsToMany(Tag::class, 'tag_taggable', 'product_id', 'tag_id');
     }
 
     public function registerMediaCollections(): void
