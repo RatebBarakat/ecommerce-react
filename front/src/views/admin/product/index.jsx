@@ -7,6 +7,7 @@ import Pagination from "../../../components/Pagination";
 import "tw-elements-react/dist/css/tw-elements-react.min.css";
 import Table from "../../../components/Table";
 import createAxiosInstance from "../../../axios";
+import { Permission } from "../../../helpers/permissions";
 
 const Products = () => {
   const auth = useContext(AuthContext);
@@ -31,10 +32,14 @@ const Products = () => {
 
   useEffect(() => {
     let params = new URLSearchParams();
-    params.set("page", page);
-    navigate(`?${params.toString()}`);
+    if (page != 1) {
+      params.set("page", page);
+      navigate(`?${params.toString()}`);
+    } else {
+      params.delete("page");
+      navigate(``);
+    }
   }, [page]);
-
 
   const handleDelete = (id) => {
     if (!confirm("are you sure you want to delete this product")) {
@@ -122,7 +127,7 @@ const Products = () => {
     axios
       .get(paginateUrl)
       .then((response) => {
-        console.log('response.data.data :>> ', response.data);
+        console.log("response.data.data :>> ", response.data);
         setProducts(response.data.data);
         setNumberOfPages(response.data.meta.last_page);
         setPerPage(response.data.meta.per_page);
@@ -135,8 +140,10 @@ const Products = () => {
   };
 
   useEffect(() => {
-    if (!auth.permissions.includes("read-products")) {
-      return navigate("/");
+    if (!Permission.can(auth, "read-products")) {
+      return navigate("/user/dashboard", {
+        replace: true,
+      });
     } else {
       let params = new URLSearchParams(location.search);
       fetchProducts(page);
@@ -158,7 +165,10 @@ const Products = () => {
     <>
       <div className="container w-screen sm:!w-11/12 mx-auto">
         <div className="flex justify-between">
-          <Link to='/user/products/create' className="inline-block ml-3 rounded mt-3 bg-indigo-600 px-6 pb-2 pt-2.5 text-base font-medium leading-normal text-white">
+          <Link
+            to="/user/products/create"
+            className="inline-block ml-3 rounded mt-3 bg-indigo-600 px-6 pb-2 pt-2.5 text-base font-medium leading-normal text-white"
+          >
             Add product
           </Link>
           {selected.length > 0 && (
