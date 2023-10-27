@@ -17,7 +17,7 @@ class ProductResource extends JsonResource
     {
         $this->load("media");
         $this->load("tags");
-        
+
         $images = [];
         $media = $this->getMedia('images');
 
@@ -44,7 +44,8 @@ class ProductResource extends JsonResource
                 'id' => $category->id,
                 'name' => $category->name
             ],
-            'tags' => TagResource::collection($this->tags),
+            'tags' => $request->routeIs('product.index') ? implode(',', $this->tags->pluck('name')->toArray())
+                : TagResource::collection($this->tags),
         ];
     }
 }
