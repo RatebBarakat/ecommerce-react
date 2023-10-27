@@ -212,7 +212,7 @@ const Tags = () => {
 
   useEffect(() => {
     if (!Permission.can(auth, "read-tags")) {
-      return navigate("/user/dashboard", {
+      return navigate("/admin/dashboard", {
         replace: true,
       });
     } else {
@@ -234,7 +234,9 @@ const Tags = () => {
             Add tag
           </button>
           {selected.length > 0 && (
-            <button onClick={(event) => handleDeleteMany()}>
+            <button
+            className="inline-block ml-3 rounded mt-3 bg-red-600 px-6 pb-2 pt-2.5 text-base font-medium leading-normal text-white"
+            onClick={(event) => handleDeleteMany()}>
               delete selected
             </button>
           )}
@@ -273,7 +275,7 @@ const Tags = () => {
           label="name"
           type="text"
           value={form.name}
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500"
           onChange={(event) => setForm({ ...form, name: event.target.value })}
           placeholder="name"
         />

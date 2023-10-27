@@ -45,7 +45,7 @@ const router = createBrowserRouter([
         ]
     },
     {
-        path: '/user',
+        path: '/admin',
         element: <AuthLayout />,
         children: [
             {
@@ -72,6 +72,20 @@ const router = createBrowserRouter([
                 path: 'products/edit/:id',
                 element: <Updateproduct />
             },
+            {
+                path: 'profile',
+                element: <Profile />
+            },
+            {
+                path: 'verify',
+                element: <VerifyEmail />
+            },
+        ]
+    },
+    {
+        path: '/user',
+        element: <AuthLayout />,
+        children: [
             {
                 path: 'profile',
                 element: <Profile />

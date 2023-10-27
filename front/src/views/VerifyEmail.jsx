@@ -11,7 +11,7 @@ const VerifyEmail = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if(auth.isVerified) navigate('/user/dashboard');
+    if(auth.isVerified) navigate('/admin/dashboard');
   },[auth.user,auth.isLoading])
 
   const handleResendVerification = async () => {

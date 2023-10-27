@@ -224,9 +224,9 @@ const Categories = () => {
   };
 
   useEffect(() => {
-    if (!Permission.can(auth,"read-categories")) {
-      return navigate('/user/dashboard',{
-        replace : true
+    if (!Permission.can(auth, "read-categories")) {
+      return navigate("/admin/dashboard", {
+        replace: true,
       });
     } else {
       let params = new URLSearchParams(location.search);
@@ -250,7 +250,10 @@ const Categories = () => {
             Add Category
           </button>
           {selected.length > 0 && (
-            <button onClick={(event) => handleDeleteMany()}>
+            <button
+              className="inline-block ml-3 rounded mt-3 bg-red-600 px-6 pb-2 pt-2.5 text-base font-medium leading-normal text-white"
+              onClick={(event) => handleDeleteMany()}
+            >
               delete selected
             </button>
           )}

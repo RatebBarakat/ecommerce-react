@@ -33,7 +33,7 @@ export default function UpdateProduct() {
   });
 
   useEffect(() => {
-    if (!id) return navigate("/user/products");
+    if (!id) return navigate("/admin/products");
   }, [id]);
 
   const fetchProduct = () => {
@@ -64,7 +64,7 @@ export default function UpdateProduct() {
       .catch((error) => {
         if (error.response.status === 404) {
           Toast.notifyMessage("error", "Product not found");
-          return navigate("/user/dashboard");
+          return navigate("/admin/dashboard");
         }
       })
       .finally(() => {
@@ -212,7 +212,7 @@ export default function UpdateProduct() {
         },
       })
       .then((response) => {
-        navigate("/user/products");
+        navigate("/admin/products");
       })
       .catch((error) => {
         console.log("error: ", error);

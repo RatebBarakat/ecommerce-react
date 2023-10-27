@@ -99,7 +99,7 @@ export default function CreateProduct() {
         },
       })
       .then((response) => {
-        navigate("/user/products");
+        navigate("/admin/products");
       })
       .catch((error) => {
         let errorFromRequest = ErrorHelper.extractErrorMessage(error);

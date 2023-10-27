@@ -10,7 +10,7 @@ export default function GuestLayout() {
     
     return (
         auth.isLoading ?<Loading centered={true}  size={'large'} /> :
-        auth.user ? <Navigate to='/user/dashboard' /> :<Outlet />
+        auth.user ? <Navigate to='/admin/dashboard' /> :<Outlet />
     );
 
 };

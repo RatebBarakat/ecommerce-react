@@ -28,9 +28,16 @@ const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    axios.post("/logout").then(() => {
-      setUser(null);
-    });
+    setIsLoading(true);
+    axios
+      .post("/logout")
+      .then(() => {
+        setUser(null);
+        setIsLoading(false);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   useEffect(() => {

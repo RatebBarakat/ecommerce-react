@@ -30,7 +30,7 @@ const Login = () => {
             });
             await authContext.fetchUser();
             await profileContext.fetchProfile();
-            navigate('/user/dashboard');
+            navigate('/admin/dashboard');
         } catch (error) {
             console.log('error :>> ', error);
             setErrors(error.response.data.errors);

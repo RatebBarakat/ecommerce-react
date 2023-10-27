@@ -4,8 +4,8 @@ import { Permission } from "../../helpers/permissions";
 import { AuthContext } from "../../contexts/auth";
 
 const DashboardLink = ({ to, text }) => (
-  <div className="container mx-auto border hover:shadow-lg md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-    <Link to={to} className="dashboard-link">
+  <div className="container mx-auto text-center border hover:shadow-lg">
+    <Link to={to} className="dashboard-link w-full">
       <div className="dashboard-link-content p-4 bg-white rounded-lg">
         <span className="dashboard-link-text text-lg font-semibold">{text}</span>
       </div>
@@ -17,9 +17,9 @@ export default function Dashboard() {
   const auth = useContext(AuthContext);
 
   const dashboardLinks = [
-    { permission: "read-categories", route: "/user/categories", text: "Categories" },
-    { permission: "read-products", route: "/user/products", text: "Products" },
-    { permission: "read-tags", route: "/user/tags", text: "Tags" },
+    { permission: "read-categories", route: "/admin/categories", text: "Categories" },
+    { permission: "read-products", route: "/admin/products", text: "Products" },
+    { permission: "read-tags", route: "/admin/tags", text: "Tags" },
   ];
 
   return (
