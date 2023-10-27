@@ -114,7 +114,7 @@ const Products = () => {
   };
 
   const handleEdit = (id) => {
-    navigate(`/user/products/edit/${id}`);
+    navigate(`/admin/products/edit/${id}`);
   };
 
   const fetchProducts = async (page = null) => {
@@ -141,7 +141,7 @@ const Products = () => {
 
   useEffect(() => {
     if (!Permission.can(auth, "read-products")) {
-      return navigate("/user/dashboard", {
+      return navigate("/admin/dashboard", {
         replace: true,
       });
     } else {
@@ -159,6 +159,7 @@ const Products = () => {
     { title: "quantity", dataField: "quantity" },
     { title: "first image", dataField: "images", type: "image" },
     { title: "category", dataField: "category.name", type: "array" },
+    { title: "tags", dataField: "tags" },
   ];
 
   return (
@@ -166,13 +167,16 @@ const Products = () => {
       <div className="container w-screen sm:!w-11/12 mx-auto">
         <div className="flex justify-between">
           <Link
-            to="/user/products/create"
+            to="/admin/products/create"
             className="inline-block ml-3 rounded mt-3 bg-indigo-600 px-6 pb-2 pt-2.5 text-base font-medium leading-normal text-white"
           >
             Add product
           </Link>
           {selected.length > 0 && (
-            <button onClick={(event) => handleDeleteMany()}>
+            <button
+              className="inline-block ml-3 rounded mt-3 bg-red-600 px-6 pb-2 pt-2.5 text-base font-medium leading-normal text-white"
+              onClick={(event) => handleDeleteMany()}
+            >
               delete selected
             </button>
           )}
