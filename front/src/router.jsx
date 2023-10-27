@@ -15,6 +15,7 @@ import Dashboard from "./views/admin/dashboard";
 import Products from "./views/admin/product";
 import CreateProduct from "./views/admin/product/create";
 import Updateproduct from "./views/admin/product/update";
+import Tags from "./views/admin/tag";
 
 const router = createBrowserRouter([
     {
@@ -58,6 +59,10 @@ const router = createBrowserRouter([
             {
                 path: 'products',
                 element: <Products />
+            },
+            {
+                path: 'tags',
+                element: <Tags />
             },
             {
                 path: 'products/create',

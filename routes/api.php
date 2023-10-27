@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\Admin\CategoryController;
 use App\Http\Controllers\Api\Admin\ProductController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\TagController;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\Role;
 use App\Models\User;
@@ -39,12 +40,16 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 Route::middleware(['auth:sanctum','verified'])->group(function() {
     Route::post('category/deleteMany',[CategoryController::class,'deleteMany']);
     Route::post('product/deleteMany',[ProductController::class,'deleteMany']);
+    Route::post('product/uploadImage/{product:id}',[ProductController::class,'uploadImage']);
     Route::post('product/deleteImage',[ProductController::class,'deleteImage']);
     Route::apiResource('category',CategoryController::class,[
         'name' => 'category.'
     ]);
     Route::apiResource('product',ProductController::class,[
         'name' => 'product.'
+    ]);
+    Route::apiResource('tag',TagController::class,[
+        'name' => 'tag.'
     ]);
     Route::get('/profile',[ProfileController::class,'show']);
     Route::post('/profile',[ProfileController::class,'update']);
