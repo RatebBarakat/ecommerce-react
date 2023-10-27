@@ -89,14 +89,14 @@ export default function AuthLayout() {
                 </div>
               </div>
             )}
-            {!profile.isProfileLoading && profile.profile?.avatar && (
+            {!profile.isProfileLoading && (
               <>
                 <Menu as="div" className="relative inline-block text-left">
                   <div>
                     <Menu.Button className="">
                       <img
                         className="w-12 h-12 rounded-full"
-                        src={avatar}
+                        src={avatar ?? "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIoAAAB7CAMAAACcl+jqAAAALVBMVEXK0eL////N1OT4+fvX3Ona3+vHzuDT2efx8/f7/P3p7PPk6PDt7/Xg5O719vngRy7KAAADoUlEQVR4nO3c63KrIBQFYOXqDd//cQsaEzUge20lk7aumXP+tON8RcANmFQ1O+0qcsooxynNI4NPN3QhfYhzvdNah39a+Vgf8UhVVXLJ6yLDdInnBcIlpug5Si2XmSOeqcIFEzHpHy2xicuYkPn/OflLncvhH/LZ3JRYbkos9qZE8kUUdVMi+SKKvimRXEO55M85QzHGus6XN486Z9DnCokTFNvJfVnXacHXcCnGdm2syJSabXFMiotCQtxnKWI4qL67T1LsvpNsM/AoPYMijiV13bBuOocyZiQ8i2FQjvrJEmnxgdShFOMIEj/FKAYFjEiO4m3G4hTT0yR1rXEKeIOoErxZUIoiU+DeglI0mVL34CAaQAq5q/jJpTCFMqksFExSNSCloVPQfluQUrhVRP758x8pufpgTQFHUMlWKUwp2CrgiLspZynDr6UI+S8o3U35W5QWo2RWy5uABSVIAaqVcJ4HFdogBWiTqV2Qa1uIQl0ZLoF2fTAK2irQAvGmXEABargQW45ioMFc11CBaGuIAqwNQ5BroxRgxeyDPVQUJqdvaYRgFSVIQZ6G6PMQpGB3CBpAKAWa+sFtPg1SKtpWaYgEN/lgiiBTHLj2gCn0WQ7rKRxKR70/4IVxCnmLEt4mxynUWQ4+LHMwhTqc0a5icAqx38JdhUEhdhZ0K5tFIe0it/CBF4tC6S1wo4THG04hWBhnhzxKvrugw4dPyTULPHzKUfBzw+mJUoKCbqn/DYr92xQ/c/5ySm5e4YwgHiW7BJGcl4w4FJffT+gZL400hYqEEbcwKLTSCV16cCiWJGFUCTiFuDwEt7I5FOo6aIQpI0yhbsfBLxjBFPKaGZ3mBEox9PdXwBc7hQQpmr7tNGqorIQoRvTgFvLY05uGTjHCgZu2U9pGUT6jRKeYSr295ktvGkd6CNAovAZ5RVLuU57iG+ScY0qbx/h6+RhytkHWmFMUocGjjmPM4eA+ohhDqJEwzKDTwylN8bcGPCgkalSi19gEBZ/N6PGDO4ZJUVwxSIiMHfpGKaYsZMa8tUyMcsU8kk+7b5l3iqDuVp9Oow4pRhW/N6+0m4+HqN1R48eaZE6fpnyklyQsWwp2XnpJVJQClK3X5fWW2JqCnZZeFRWhgMfZV+W5itRrSjN/mn+UybTMhJeNdoT28X0Czy1eve4rSKps1pXS9CH/fabfEM9f0+ArDAXzZRR9GBWNtatvbHiLEJvvcUikmm7amvIDTuIuybQHTykAAAAASUVORK5CYII="}
                         alt="Rounded avatar"
                       />
                     </Menu.Button>
