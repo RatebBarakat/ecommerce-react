@@ -13,6 +13,7 @@ import ReactPaginate from "react-paginate";
 import "tw-elements-react/dist/css/tw-elements-react.min.css";
 import Table from "../../../components/Table";
 import createAxiosInstance from "../../../axios";
+import { Permission } from "../../../helpers/permissions";
 
 const Categories = () => {
   const axios = createAxiosInstance();
@@ -58,9 +59,14 @@ const Categories = () => {
   }, [editForm.name]);
 
   useEffect(() => {
-    let params = new URLSearchParams();
-    params.set("page", page);
-    navigate(`?${params.toString()}`);
+    let params = new URLSearchParams(location.search);
+    if (page != 1) {
+      params.set("page", page);
+      navigate(`?${params.toString()}`);
+    } else {
+      params.delete("page");
+      navigate(``);
+    }
   }, [page]);
 
   const navigate = useNavigate();
@@ -218,8 +224,10 @@ const Categories = () => {
   };
 
   useEffect(() => {
-    if (!auth.permissions.includes("read-categories")) {
-      return navigate("/");
+    if (!Permission.can(auth,"read-categories")) {
+      return navigate('/user/dashboard',{
+        replace : true
+      });
     } else {
       let params = new URLSearchParams(location.search);
       params.get("page") ? fetchCategories(page) : fetchCategories();
@@ -294,7 +302,7 @@ const Categories = () => {
           placeholder="country"
         />
       </Modal>
-      
+
       <Modal
         header="edit category"
         identifier="edit"

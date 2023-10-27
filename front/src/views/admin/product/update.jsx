@@ -28,7 +28,7 @@ export default function UpdateProduct() {
     price: "",
     quantity: "",
     images: [],
-    tags : [],
+    tags: [],
     category_id: 12,
   });
 
@@ -50,12 +50,14 @@ export default function UpdateProduct() {
               url: image.url,
               file: image.url,
             })) || [],
-            tags : Array.from(data.tags?.map((tag) => {
+          tags: Array.from(
+            data.tags?.map((tag) => {
               return {
-                value : tag.id,
-                label : tag.name,
-              }
-            }) || [])
+                value: tag.id,
+                label: tag.name,
+              };
+            }) || []
+          ),
         });
         setTemporaryImages(data.images);
       })
@@ -73,14 +75,18 @@ export default function UpdateProduct() {
   useEffect(() => {
     axios.get("api/category?type=all").then((response) => {
       setCategories(response.data.data);
-      fetchProduct();
-      axios.get("/api/tag").then((response) => {
-        const tagsFromResponse = response.data.data.map((tag) => ({
-          value: tag.id,
-          label: tag.name,
-        }));
-        setSuggestions(tagsFromResponse);
-      });
+      axios
+        .get("/api/tag")
+        .then((response) => {
+          const tagsFromResponse = response.data.data.map((tag) => ({
+            value: tag.id,
+            label: tag.name,
+          }));
+          setSuggestions(tagsFromResponse);
+        })
+        .then(() => {
+          fetchProduct();
+        });
     });
   }, [id, auth.permissions]);
 
@@ -186,7 +192,6 @@ export default function UpdateProduct() {
 
     formData.append("_method", "PUT");
 
-
     for (const key in product) {
       if (key !== "images" && key !== "tags") {
         formData.append(key, product[key]);
@@ -194,9 +199,8 @@ export default function UpdateProduct() {
     }
 
     if (product.tags) {
-      console.log('product.tags :>> ', product.tags);
-      Array.from(product.tags).map((image) => {
-        formData.append("tags[]", image.value);
+      Array.from(product.tags).map((tag) => {
+        formData.append("tags[]", tag.value);
       });
     }
 
@@ -317,9 +321,17 @@ export default function UpdateProduct() {
                   borderRadius: "0.375rem",
                   border: "1px solid #D1D5DB",
                 }),
+                multiValueLabel: (styles) => ({
+                  ...styles,
+                  color: "white",
+                }),
                 multiValue: (styles) => ({
                   ...styles,
                   borderRadius: "0.375rem",
+                  backgroundColor: "#4f46e5",
+                  color: "white",
+                  margin: "2px",
+                  padding: "2px 4px",
                 }),
               }}
             />
@@ -374,7 +386,10 @@ export default function UpdateProduct() {
             ))}
           </div>
           {progress !== 0 && (
-            <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+            <div
+              className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700"
+              style={{ gridColumnStart: "1", gridColumnEnd: "3" }}
+            >
               <div
                 className="bg-indigo-600 h-2.5 rounded-full"
                 style={{ width: `${progress}%` }}

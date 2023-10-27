@@ -13,6 +13,7 @@ import ReactPaginate from "react-paginate";
 import "tw-elements-react/dist/css/tw-elements-react.min.css";
 import Table from "../../../components/Table";
 import createAxiosInstance from "../../../axios";
+import { Permission } from "../../../helpers/permissions";
 
 const Tags = () => {
   const axios = createAxiosInstance();
@@ -48,8 +49,13 @@ const Tags = () => {
 
   useEffect(() => {
     let params = new URLSearchParams();
-    params.set("page", page);
-    navigate(`?${params.toString()}`);
+    if (page != 1) {
+      params.set("page", page);
+      navigate(`?${params.toString()}`);
+    } else {
+      params.delete("page");
+      navigate(``);
+    }
   }, [page]);
 
   const navigate = useNavigate();
@@ -67,9 +73,7 @@ const Tags = () => {
   };
 
   const resetInputs = (type) => {
-    type == "add"
-      ? setForm({ name: "" })
-      : setEditForm({ name: "" });
+    type == "add" ? setForm({ name: "" }) : setEditForm({ name: "" });
   };
 
   const handleSubmit = async () => {
@@ -187,9 +191,9 @@ const Tags = () => {
 
   const fetchTags = async (page = null) => {
     !isLoading && setIsLoading(true);
-    page !== null && setPage(page);
+    page !== null && page !== 1 && setPage(page);
     let paginateUrl = "api/tag";
-    if (page !== null) {
+    if (page !== null && page !== 1) {
       paginateUrl += `?page=${page}`;
     }
     axios
@@ -207,17 +211,17 @@ const Tags = () => {
   };
 
   useEffect(() => {
-    if (!auth.permissions.includes("read-tags")) {
-      return navigate("/");
+    if (!Permission.can(auth, "read-tags")) {
+      return navigate("/user/dashboard", {
+        replace: true,
+      });
     } else {
       let params = new URLSearchParams(location.search);
-      params.get("page") ? fetchTags(page) : fetchTags();
+      params.get("page") !== 1 ? fetchTags(page) : fetchTags();
     }
   }, [auth.permissions]);
 
-  const columns = [
-    { title: "Name", dataField: "name" },
-  ];
+  const columns = [{ title: "Name", dataField: "name" }];
 
   return (
     <>

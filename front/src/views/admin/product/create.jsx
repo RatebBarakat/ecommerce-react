@@ -26,7 +26,7 @@ export default function CreateProduct() {
     quantity: "",
     images: [],
     category_id: 0,
-    tags: [], // Store tag IDs here
+    tags: [],
   });
 
   useEffect(() => {
@@ -68,7 +68,6 @@ export default function CreateProduct() {
     event.preventDefault();
     const formData = new FormData();
 
-
     for (const key in product) {
       if (key !== "images" && key !== "tags") {
         formData.append(key, product[key]);
@@ -82,8 +81,8 @@ export default function CreateProduct() {
     }
 
     if (product.tags) {
-      Array.from(product.tags).map((image) => {
-        formData.append("tags[]", image.value);
+      Array.from(product.tags).map((tag) => {
+        formData.append("tags[]", tag.value);
       });
     }
 
@@ -211,9 +210,17 @@ export default function CreateProduct() {
                   borderRadius: "0.375rem",
                   border: "1px solid #D1D5DB",
                 }),
+                multiValueLabel: (styles) => ({
+                  ...styles,
+                  color: "white",
+                }),
                 multiValue: (styles) => ({
                   ...styles,
                   borderRadius: "0.375rem",
+                  backgroundColor: "#4f46e5",
+                  color: "white",
+                  margin: "2px",
+                  padding: "2px 4px",
                 }),
               }}
             />
@@ -249,9 +256,11 @@ export default function CreateProduct() {
             onChange={handleFileUpload}
             style={{ gridColumnStart: "1", gridColumnEnd: "3" }}
           />
-
           {progress !== 0 && (
-            <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+            <div
+              className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700"
+              style={{ gridColumnStart: "1", gridColumnEnd: "3" }}
+            >
               <div
                 className="bg-indigo-600 h-2.5 rounded-full"
                 style={{

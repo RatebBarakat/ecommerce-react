@@ -16,7 +16,8 @@ const createAxiosInstance = (authContext = null) => {
     response => response,
     error => {
       if (error.response && error.response.status === 403) {
-        Toast.notifyMessage('error', error.response.data?.message ?? 'unauthorized');
+        authContext && authContext.fetchUser(); 
+        console.log('fetch complete :>> ');
       }
       if (error.response && error.response.status === 401) {
         authContext && authContext.fetchUser(); 
