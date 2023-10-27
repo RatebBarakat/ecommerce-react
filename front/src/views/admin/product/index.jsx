@@ -63,6 +63,7 @@ const Products = () => {
     axios
       .post(`/api/product/deleteMany`, { ids: Array.from(selected) })
       .then((response) => {
+        setSelected([]);
         fetchProducts(1);
         Toast.notifyMessage("success", "products delted");
       })

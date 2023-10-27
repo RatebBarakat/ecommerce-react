@@ -294,6 +294,7 @@ const Categories = () => {
           placeholder="country"
         />
       </Modal>
+      
       <Modal
         header="edit category"
         identifier="edit"
