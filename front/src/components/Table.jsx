@@ -85,10 +85,17 @@ export default function Table({
                     />
                   </td>
                   {Array.from(columns).map((column, index) => (
-                    <td key={index} className="px-4 text-sm">
+                    <td
+                      key={index}
+                      className="px-4 text-sm overflow-y-auto"
+                      style={{ maxWidth: "200px" }}
+                    >
                       {column.type === "image" ? (
                         item[column.dataField] ? (
-                          <img src={item[column.dataField]['url']} alt="Product" />
+                          <img
+                            src={item[column.dataField]["url"]}
+                            alt="Product"
+                          />
                         ) : (
                           <p>no image</p>
                         )
