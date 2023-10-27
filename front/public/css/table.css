@@ -15,3 +15,25 @@ table {
 table tr td {
     vertical-align: middle !important;
 }
+
+table tr td {
+    max-width: 150px; 
+    max-height: 100px; 
+    overflow: auto;
+    scrollbar-width: thin; 
+    scrollbar-color: darkgray lightgray;
+  }
+  
+  table tr td::-webkit-scrollbar {
+    width: 6px; 
+    height: 10px;
+  }
+  
+  table tr td::-webkit-scrollbar-thumb {
+    background: darkgray; 
+    border-radius: 3px; 
+  }
+  
+  table tr td::-webkit-scrollbar-track {
+    background: lightgray; 
+  }
