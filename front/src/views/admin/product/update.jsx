@@ -1,20 +1,24 @@
 import { useContext, useEffect, useState } from "react";
 import Loading from "../../../components/Loading";
 import { Input } from "../../../components/input";
-import axios from "../../../axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../../contexts/auth";
 import Toast from "../../../components/Toast";
 import createAxiosInstance from "../../../axios";
+import Select from "react-select";
 
-export default function Updateproduct() {
+export default function UpdateProduct() {
   const [isLoading, setIsLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [temporaryImages, setTemporaryImages] = useState([]);
   let { id } = useParams();
-  const navigate = useNavigate();
   const auth = useContext(AuthContext);
+  const [tags, setTags] = useState([]);
   const axios = createAxiosInstance(auth);
+  const navigate = useNavigate();
+  const [progress, setProgress] = useState(0);
+  const [categories, setCategories] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
 
   const [product, setProduct] = useState({
     name: "",
@@ -24,36 +28,42 @@ export default function Updateproduct() {
     price: "",
     quantity: "",
     images: [],
+    tags : [],
     category_id: 12,
   });
 
   useEffect(() => {
     if (!id) return navigate("/user/products");
-  }, [id, navigate]);
+  }, [id]);
 
   const fetchProduct = () => {
     axios
       .get(`/api/product/${id}`)
       .then((response) => {
         const data = response.data.data;
-        setProduct(() => ({
+        setProduct({
           ...data,
+          category_id: data.category?.id,
           images:
             data.images?.map((image) => ({
-              id: image,
-              url: image,
+              id: image.id,
+              url: image.url,
+              file: image.url,
             })) || [],
-        }));
+            tags : Array.from(data.tags?.map((tag) => {
+              return {
+                value : tag.id,
+                label : tag.name,
+              }
+            }) || [])
+        });
         setTemporaryImages(data.images);
-        console.log("temporaryImages :>> ", temporaryImages);
       })
       .catch((error) => {
-        console.log("error.response.status :>> ", error.response.status);
-        if (error.response.status == 404) {
-          Toast.notifyMessage("error", "product not found");
+        if (error.response.status === 404) {
+          Toast.notifyMessage("error", "Product not found");
           return navigate("/user/dashboard");
         }
-        console.log("error :>> ", error);
       })
       .finally(() => {
         setIsLoading(false);
@@ -61,7 +71,17 @@ export default function Updateproduct() {
   };
 
   useEffect(() => {
-    fetchProduct();
+    axios.get("api/category?type=all").then((response) => {
+      setCategories(response.data.data);
+      fetchProduct();
+      axios.get("/api/tag").then((response) => {
+        const tagsFromResponse = response.data.data.map((tag) => ({
+          value: tag.id,
+          label: tag.name,
+        }));
+        setSuggestions(tagsFromResponse);
+      });
+    });
   }, [id, auth.permissions]);
 
   const handleRemoveImage = (image) => {
@@ -96,20 +116,63 @@ export default function Updateproduct() {
 
   const [errors, setErrors] = useState([]);
 
-  const handleFileUpload = (event) => {
-    const uploadedImages = [];
+  const handleFileUpload = async (event) => {
     const files = Array.from(event.target.files);
 
-    files.forEach((image) => {
-      const imageUrl = URL.createObjectURL(image);
-      uploadedImages.push({ id: null, url: imageUrl, file: image });
+    if (temporaryImages.length + files.length > 5) {
+      Toast.notifyMessage(
+        "error",
+        "you cannot upload more than  images for single product"
+      );
+      return;
+    }
+
+    const formData = new FormData();
+
+    files.forEach((file) => {
+      formData.append("images[]", file);
     });
 
-    setProduct((prevProduct) => ({
-      ...prevProduct,
-      images: [...prevProduct.images, ...uploadedImages],
-    }));
-    setTemporaryImages([...temporaryImages, ...uploadedImages]);
+    axios
+      .post(`/api/product/uploadImage/${id}`, formData, {
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setProgress(percentCompleted);
+        },
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((response) => {
+        const uploadedImages = response.data.images;
+        const imagesToAdd = uploadedImages.map((image) => ({
+          id: image.id,
+          url: image.url,
+          file: image.url,
+        }));
+
+        setProduct((prevProduct) => ({
+          ...prevProduct,
+          images: [...prevProduct.images, ...imagesToAdd],
+        }));
+        setTemporaryImages([...temporaryImages, ...imagesToAdd]);
+      })
+      .catch((error) => {
+        Toast.notify("error", error.response.data.message);
+      })
+      .finally(() => {
+        setProgress(0);
+      });
+    event.target.value = "";
+  };
+
+  const handleTagChange = (selectedOptions) => {
+    setProduct({
+      ...product,
+      tags: selectedOptions,
+    });
   };
 
   useEffect(() => {
@@ -118,27 +181,26 @@ export default function Updateproduct() {
 
   const handleSubmission = async (event) => {
     event.preventDefault();
+    setProcessing(true);
     const formData = new FormData();
 
     formData.append("_method", "PUT");
 
+
     for (const key in product) {
-      if (key != "images") {
+      if (key !== "images" && key !== "tags") {
         formData.append(key, product[key]);
       }
     }
 
-    formData.append("category_id", 1);
-
-    const newImages = product.images.filter((image) => image.id === null);
-    console.log('newImages :>> ', newImages);
-
-    if (newImages.length > 0) {
-      product.images.forEach((image) => {
-        formData.append("images[]", image.file);
+    if (product.tags) {
+      console.log('product.tags :>> ', product.tags);
+      Array.from(product.tags).map((image) => {
+        formData.append("tags[]", image.value);
       });
     }
 
+    formData.append("category_id", 1);
     axios
       .post(`/api/product/${id}`, formData, {
         headers: {
@@ -146,10 +208,13 @@ export default function Updateproduct() {
         },
       })
       .then((response) => {
-        console.log("response: ", response);
+        navigate("/user/products");
       })
       .catch((error) => {
         console.log("error: ", error);
+      })
+      .finally(() => {
+        setProcessing(false);
       });
   };
 
@@ -161,19 +226,18 @@ export default function Updateproduct() {
         <form
           onSubmit={handleSubmission}
           action=""
-          className="lg:!w-3/4 sm:grid mt-3 rounded shadow-2xl sm:grid-cols-2 sm:gap-3 mx-auto justify-center p-4"
+          className="lg:w-3/4 sm:grid mt-3 rounded shadow-2xl sm:grid-cols-2 sm:gap-3 mx-auto justify-center p-4"
         >
           <h2
             className="text-center font-bold text-3xl text-indigo-600"
             style={{ gridColumnStart: "1", gridColumnEnd: "3" }}
           >
-            product
+            Product
           </h2>
           <Input
             label="name"
             type="text"
             value={product.name}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             onChange={(event) =>
               setProduct({ ...product, name: event.target.value })
             }
@@ -235,43 +299,97 @@ export default function Updateproduct() {
             error={errors?.quantity || null}
             placeholder="quantity"
           />
+          <div>
+            <label
+              htmlFor="tags"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Select tags
+            </label>
+            <Select
+              isMulti
+              options={suggestions}
+              value={product.tags}
+              onChange={handleTagChange}
+              styles={{
+                control: (styles) => ({
+                  ...styles,
+                  borderRadius: "0.375rem",
+                  border: "1px solid #D1D5DB",
+                }),
+                multiValue: (styles) => ({
+                  ...styles,
+                  borderRadius: "0.375rem",
+                }),
+              }}
+            />
+          </div>
+          <div>
+            <label
+              for="countries"
+              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Select an option
+            </label>
+            <select
+              value={product.category_id}
+              onChange={(event) =>
+                setProduct({ ...product, category_id: event.target.value })
+              }
+              id="countries"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            >
+              <option selected>Choose a country</option>
+              {categories &&
+                categories.map((cat) => (
+                  <option value={cat.id}>{cat.name}</option>
+                ))}
+            </select>
+          </div>
           <Input
             label="images"
             type="file"
             name="file"
             multiple={true}
             error={errors?.images || null}
-            onChange={(event) => handleFileUpload(event)}
+            onChange={handleFileUpload}
             style={{ gridColumnStart: "1", gridColumnEnd: "3" }}
           />
           <div
             className="flex gap-2 flex-wrap w-full"
             style={{ gridColumnStart: "1", gridColumnEnd: "3" }}
           >
-            {temporaryImages &&
-              temporaryImages.map((image) => {
-                return (
-                  <div key={image.id ?? image.url} className="image-container">
-                    <img className="w-14 h-14" src={image.url} alt="display" />
-                    <button
-                      type="button"
-                      disabled={processing}
-                      onClick={() => handleRemoveImage(image)}
-                      className="bg-red-600 text-white rounded disabled:bg-red-300 disabled:cursor-not-allowed"
-                    >
-                      x
-                    </button>
-                  </div>
-                );
-              })}
+            {temporaryImages.map((image) => (
+              <div key={image.id ?? image.url} className="image-container">
+                <img className="w-14 h-14" src={image.url} alt="display" />
+                <button
+                  type="button"
+                  disabled={processing}
+                  onClick={() => handleRemoveImage(image)}
+                  className="bg-red-600 text-white px-1 mt-1 rounded disabled:bg-red-300 disabled:cursor-not-allowed"
+                >
+                  x
+                </button>
+              </div>
+            ))}
           </div>
+          {progress !== 0 && (
+            <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+              <div
+                className="bg-indigo-600 h-2.5 rounded-full"
+                style={{ width: `${progress}%` }}
+              ></div>
+            </div>
+          )}
           <button
-            disabled={processing}
-            className="group disabled:cursor-not-allowed disabled:!bg-indigo-400 relative py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white !bg-indigo-600 hover:!bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            disabled={processing || progress !== 0}
+            className="group !bg-indigo-600 disabled:cursor-not-allowed
+             disabled:bg-indigo-400 relative py-2 px-4 border border-transparent
+              text-sm font-medium rounded-md text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             type="submit"
             style={{ gridColumnStart: "1", gridColumnEnd: "3" }}
           >
-            update product
+            {processing || progress !== 0 ? "Updating..." : "Update Product"}
           </button>
         </form>
       )}
