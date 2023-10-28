@@ -22,7 +22,6 @@ const Login = () => {
         withCredentials: "include",
       });
     }
-    debugger;
     try {
       await axios.post("/login", {
         email: email,
