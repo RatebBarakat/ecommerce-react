@@ -34,6 +34,7 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return response()->json([
         'user' => $user,
         'permissions' => $permissions,
+        'role' => $user->role->name,
     ]);
 });
 
