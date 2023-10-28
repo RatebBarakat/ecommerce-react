@@ -1,4 +1,3 @@
-// axios.js or wherever you set up Axios
 import Axios from 'axios';
 import Toast from './components/Toast';
 
@@ -16,12 +15,10 @@ const createAxiosInstance = (authContext = null) => {
     response => response,
     error => {
       if (error.response && error.response.status === 403) {
-        authContext && authContext.fetchUser(); 
-        console.log('fetch complete :>> ');
+        authContext.fetchUser(); 
       }
       if (error.response && error.response.status === 401) {
         authContext && authContext.fetchUser(); 
-        console.log('401 from axios :>> ');
       }
       return Promise.reject(error);
     }

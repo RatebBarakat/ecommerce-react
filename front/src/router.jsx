@@ -16,6 +16,7 @@ import Products from "./views/admin/product";
 import CreateProduct from "./views/admin/product/create";
 import Updateproduct from "./views/admin/product/update";
 import Tags from "./views/admin/tag";
+import AdminLayout from "./layouts/AdminLayout";
 
 const router = createBrowserRouter([
     {
@@ -46,7 +47,7 @@ const router = createBrowserRouter([
     },
     {
         path: '/admin',
-        element: <AuthLayout />,
+        element: <AdminLayout />,
         children: [
             {
                 path: 'dashboard',

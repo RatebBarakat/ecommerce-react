@@ -30,9 +30,9 @@ const Login = () => {
             });
             await authContext.fetchUser();
             await profileContext.fetchProfile();
-            navigate('/admin/dashboard');
+            console.log('authContext.isAdmin :>> ', authContext.isAdmin);
+            authContext.isAdmin === true ? navigate('/admin/dashboard') : navigate('/user/dashboard');
         } catch (error) {
-            console.log('error :>> ', error);
             setErrors(error.response.data.errors);
         } finally {
             setEmail('');

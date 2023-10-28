@@ -7,6 +7,7 @@ const AuthContext = createContext({});
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [permissions, setPermissions] = useState({});
@@ -18,6 +19,7 @@ const AuthProvider = ({ children }) => {
       const { data } = await axios.get("/api/user");
       setUser(data.user);
       setPermissions(data.permissions);
+      setIsAdmin((data.role && data.role == 'user') ? false : true);
       setIsVerified(!!data.user.email_verified_at);
     } catch (error) {
       setUser(null);
@@ -51,6 +53,7 @@ const AuthProvider = ({ children }) => {
     isLoading,
     permissions,
     isVerified,
+    isAdmin,
     logout,
     fetchUser,
   };
