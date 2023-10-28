@@ -88,6 +88,10 @@ const router = createBrowserRouter([
         element: <AuthLayout />,
         children: [
             {
+                path: 'dashboard',
+                element: <Dashboard />
+            },
+            {
                 path: 'profile',
                 element: <Profile />
             },
