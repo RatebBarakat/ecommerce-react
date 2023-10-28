@@ -34,7 +34,7 @@ export default function CreateProduct() {
       .get("api/category?type=all")
       .then((response) => {
         setCategories(response.data.data);
-        axios.get("/api/tag").then((response) => {
+        axios.get("/api/tag?type=all").then((response) => {
           const tagsFromResponse = response.data.data.map((tag) => ({
             value: tag.id,
             label: tag.name,

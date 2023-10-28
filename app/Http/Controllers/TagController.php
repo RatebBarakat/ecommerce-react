@@ -7,6 +7,8 @@ use App\Http\Resources\TagResource;
 use App\Http\Traits\ApiResponse;
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class TagController extends Controller
 {
@@ -28,7 +30,13 @@ class TagController extends Controller
     public function index()
     {
         $this->authorize("read-tags");
-        return TagResource::collection(Tag::paginate(10));
+        return TagResource::collection(
+            request()->get('type') === "all" ?
+                Cache::remember('tags', Carbon::now()->addDay(), function () {
+                    return Tag::orderBy('id', 'desc')->get(['id', 'name']);
+                })
+                : Tag::orderBy('id', 'desc')->paginate(10)
+        );
     }
 
     public function store(TagRequest $tagRequest)
@@ -38,7 +46,8 @@ class TagController extends Controller
         return $this->successResponse(message: "tag created successfully");
     }
 
-    public function show(Tag $tag){
+    public function show(Tag $tag)
+    {
         $this->authorize("read-tags");
         return TagResource::make($tag);
     }
