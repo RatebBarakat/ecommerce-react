@@ -14,20 +14,25 @@ const AuthProvider = ({ children }) => {
   const axios = createAxiosInstance();
 
   const fetchUser = async () => {
-    !isLoading && setIsLoading(true);
+    setIsLoading(true);
+    
     try {
       const { data } = await axios.get("/api/user");
       setUser(data.user);
       setPermissions(data.permissions);
-      setIsAdmin((data.role && data.role == 'user') ? false : true);
+      const isAdmin = data.role !== 'user';
+      setIsAdmin(isAdmin);
       setIsVerified(!!data.user.email_verified_at);
+      setIsLoading(false);
+      return data.role === 'user';
     } catch (error) {
       setUser(null);
       setIsVerified(false);
-    } finally {
       setIsLoading(false);
+      throw error;
     }
   };
+  
 
   const logout = () => {
     setIsLoading(true);
