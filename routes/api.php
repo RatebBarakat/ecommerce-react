@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Admin\CategoryController;
+use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\ProductController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\TagController;
@@ -39,6 +40,7 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 });
 
 Route::middleware(['auth:sanctum','verified'])->group(function() {
+    Route::get('/counts',[DashboardController::class,'index']);
     Route::post('category/deleteMany',[CategoryController::class,'deleteMany']);
     Route::post('product/deleteMany',[ProductController::class,'deleteMany']);
     Route::post('tag/deleteMany',[TagController::class,'deleteMany']);

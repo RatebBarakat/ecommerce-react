@@ -19,7 +19,8 @@ table tr td {
 table tr td {
     max-width: 150px; 
     max-height: 100px; 
-    overflow: auto;
+    overflow-x: auto;
+    overflow-y: hidden !important;
     scrollbar-width: thin; 
     scrollbar-color: darkgray lightgray;
   }
