@@ -104,6 +104,7 @@ export default function Table({
                       {column.type === "image" ? (
                         item[column.dataField] ? (
                           <img
+                          className="w-14 h-14"
                             src={item[column.dataField]["url"]}
                             alt="Product"
                           />
