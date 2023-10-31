@@ -9,17 +9,21 @@ import Table from "../../../components/Table";
 import createAxiosInstance from "../../../axios";
 import { Permission } from "../../../helpers/permissions";
 
+const getInitialPage = () => {
+  let page = new URLSearchParams(location.search).get("page");
+  return page !== null && !isNaN(page) && page > 0 ? parseInt(page) : 1;
+};
+
 const Products = () => {
   const auth = useContext(AuthContext);
   const axios = createAxiosInstance(auth);
   const [products, setProducts] = useState([]);
   const [selected, setSelected] = useState([]);
+  const [sort, setSort] = useState(null);
   const [links, setLinks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [numberofPages, setNumberOfPages] = useState(0);
-  const [page, setPage] = useState(
-    new URLSearchParams(location.search).get("page") || 1
-  );
+  const [page, setPage] = useState(getInitialPage());
   const [perPage, setPerPage] = useState(0);
 
   const changePage = ({ selected }) => {
@@ -31,15 +35,27 @@ const Products = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    let params = new URLSearchParams();
-    if (page != 1) {
+    let params = new URLSearchParams(location.search);
+    if (page !== 1 && typeof page === "number" && page > 0) {
       params.set("page", page);
       navigate(`?${params.toString()}`);
     } else {
       params.delete("page");
-      navigate(``);
+      navigate(`?${params.toString()}`);
     }
   }, [page]);
+
+  useEffect(() => {
+    let params = new URLSearchParams(location.search);
+    if (sort != null) {
+      params.set("sort", sort);
+      navigate(`?${params.toString()}`);
+    } else {
+      params.delete("sort");
+      navigate(`?${params.toString()}`);
+    }
+    fetchProducts();
+  }, [sort]);
 
   const handleDelete = (id) => {
     if (!confirm("are you sure you want to delete this product")) {
@@ -113,17 +129,29 @@ const Products = () => {
     fetchProducts(page);
   };
 
+  const handleSort = (sort) => {
+    setSort((prev) => prev !== sort ? sort : null);
+  };
+
   const handleEdit = (id) => {
     navigate(`/admin/products/edit/${id}`);
   };
 
-  const fetchProducts = async (page = null) => {
+  const fetchProducts = async (forcePage = null) => {
     !isLoading && setIsLoading(true);
-    page !== null && setPage(page);
     let paginateUrl = "api/product";
-    if (page !== null) {
-      paginateUrl += `?page=${page}`;
+    let param = new URLSearchParams(location.search);
+
+    forcePage && setPage(forcePage);
+
+    param.set("page", forcePage || page);
+
+    if (sort !== null) {
+      param.set("sort", sort);
     }
+
+    paginateUrl += `?${param.toString()}`;
+
     axios
       .get(paginateUrl)
       .then((response) => {
@@ -146,20 +174,34 @@ const Products = () => {
       });
     } else {
       let params = new URLSearchParams(location.search);
-      fetchProducts(page);
+      fetchProducts();
     }
   }, [auth.permissions]);
 
   const columns = [
-    { title: "Name", dataField: "name" },
-    { title: "Slug", dataField: "slug" },
-    { title: "small description", dataField: "small_description" },
-    { title: "description", dataField: "description" },
-    { title: "price", dataField: "price" },
-    { title: "quantity", dataField: "quantity" },
-    { title: "first image", dataField: "images", type: "image" },
-    { title: "category", dataField: "category.name", type: "array" },
-    { title: "tags", dataField: "tags" },
+    { title: "Name", dataField: "name", sortable: true },
+    { title: "Slug", dataField: "slug", sortable: true },
+    {
+      title: "Small Description",
+      dataField: "small_description",
+      sortable: true,
+    },
+    { title: "Description", dataField: "description", sortable: true },
+    { title: "Price", dataField: "price", sortable: true },
+    { title: "Quantity", dataField: "quantity", sortable: true },
+    {
+      title: "First Image",
+      dataField: "images",
+      type: "image",
+      sortable: false,
+    },
+    {
+      title: "Category",
+      dataField: "category.name",
+      type: "array",
+      sortable: false,
+    },
+    { title: "Tags", dataField: "tags", sortable: false },
   ];
 
   return (
@@ -193,6 +235,7 @@ const Products = () => {
           handleSelectAll={handleSelectAll}
           isSelected={isSelected}
           isLoading={isLoading}
+          handleSort={handleSort}
         />
         {Object.keys(links).length > 0 && (
           <Pagination

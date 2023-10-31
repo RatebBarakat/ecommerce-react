@@ -58,7 +58,7 @@ export default function AdminLayout() {
       console.log("auth.isAdmin :>> ", auth.isAdmin);
       if (auth.isLoading === false && auth.isAdmin === false) {
         Toast.notifyMessage("error", "you cannt access this page");
-        navigate("/");
+        navigate(auth.user ? "/user/dashboard" : "/login");
       }
     };
     fetchUserAndRedirect();

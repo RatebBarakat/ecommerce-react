@@ -9,6 +9,7 @@ use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class TagController extends Controller
 {
@@ -30,12 +31,17 @@ class TagController extends Controller
     public function index()
     {
         $this->authorize("read-tags");
+
+        $validColumns = DB::getSchemaBuilder()->getColumnListing('tags');
+
+        $sort = in_array(request('sort'), $validColumns) ? request('sort') : 'id';
+
         return TagResource::collection(
             request()->get('type') === "all" ?
                 Cache::remember('tags', Carbon::now()->addDay(), function () {
                     return Tag::orderBy('id', 'desc')->get(['id', 'name']);
                 })
-                : Tag::orderBy('id', 'desc')->paginate(10)
+                : Tag::orderBy($sort, $sort == 'id' ? 'desc' : 'asc')->paginate(10)
         );
     }
 

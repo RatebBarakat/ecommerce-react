@@ -40,8 +40,6 @@ const Modal = ({ header, errors, identifier, showModal, toggleModal, onSubmit, c
     };
   }, [show, handleOutsideClick]);
 
-  console.log('rendered :>> ');
-
   return (
     <div>
       <TEModal show={show}>
