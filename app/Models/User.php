@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Mail\ResetPasswordMail;
+use App\Models\Cart;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -49,6 +50,10 @@ class User extends Authenticatable implements MustVerifyEmail,CanResetPassword
         return $this->hasOne(Profile::class)->withDefault([
             'user_id' => $this->id,
         ]);
+    }
+
+    public function carts() {
+        return $this->hasMany(Cart::class);
     }
 
     /**

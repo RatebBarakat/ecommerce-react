@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Admin\CategoryController;
 use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\ProductController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\TagController;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\Role;
@@ -24,7 +25,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {    
+Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     $user = $request->user();
 
     $permissions = DB::table('role-permission')
@@ -39,23 +40,23 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     ]);
 });
 
-Route::middleware(['auth:sanctum','verified'])->group(function() {
-    Route::get('/counts',[DashboardController::class,'index']);
-    Route::post('category/deleteMany',[CategoryController::class,'deleteMany']);
-    Route::post('product/deleteMany',[ProductController::class,'deleteMany']);
-    Route::post('tag/deleteMany',[TagController::class,'deleteMany']);
-    Route::post('product/uploadImage/{product:id}',[ProductController::class,'uploadImage']);
-    Route::post('product/deleteImage',[ProductController::class,'deleteImage']);
-    Route::apiResource('category',CategoryController::class,[
+Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    Route::apiResource('/cart',CartController::class);
+    Route::get('/counts', [DashboardController::class, 'index']);
+    Route::post('category/deleteMany', [CategoryController::class, 'deleteMany']);
+    Route::post('product/deleteMany', [ProductController::class, 'deleteMany']);
+    Route::post('tag/deleteMany', [TagController::class, 'deleteMany']);
+    Route::post('product/uploadImage/{product:id}', [ProductController::class, 'uploadImage']);
+    Route::post('product/deleteImage', [ProductController::class, 'deleteImage']);
+    Route::apiResource('category', CategoryController::class, [
         'name' => 'category.'
     ]);
-    Route::apiResource('product',ProductController::class,[
+    Route::apiResource('product', ProductController::class, [
         'name' => 'product.'
     ]);
-    Route::apiResource('tag',TagController::class,[
+    Route::apiResource('tag', TagController::class, [
         'name' => 'tag.'
     ]);
-    Route::get('/profile',[ProfileController::class,'show']);
-    Route::post('/profile',[ProfileController::class,'update']);
-
+    Route::get('/profile', [ProfileController::class, 'show']);
+    Route::post('/profile', [ProfileController::class, 'update']);
 });

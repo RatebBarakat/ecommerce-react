@@ -35,7 +35,7 @@ class ProductResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'small_description' => $this->small_description,
-            'description' => $this->description,
+            (!$request->routeIs('product.index')) ?? 'description' => $this->description ,
             'price' => $this->price,
             'quantity' => $this->quantity,
             'images' => $images ? ($request->routeIs('product.index') ?
