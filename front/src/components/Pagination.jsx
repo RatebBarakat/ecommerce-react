@@ -1,6 +1,5 @@
-import React from "react";
 import ReactPaginate from "react-paginate";
-
+// eslint-disable-next-line react/prop-types
 export default function Pagination({ page, numberofPages, changePage }) {
   return (
     <ReactPaginate

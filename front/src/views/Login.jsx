@@ -1,5 +1,5 @@
-import React, { useContext, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useContext, useState } from "react";
+import { Link } from "react-router-dom";
 import { AuthContext } from "../contexts/auth";
 import Cookies from "js-cookie";
 import { ProfileContext } from "../contexts/profile";
@@ -27,7 +27,7 @@ const Login = () => {
         email: email,
         password: password,
       });
-      const isUser = await authContext.fetchUser();
+      await authContext.fetchUser();
       await profileContext.fetchProfile();
     } catch (error) {
       setErrors(error.response.data.errors);

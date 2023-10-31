@@ -1,5 +1,4 @@
-import React, { useContext, useState } from 'react';
-import { toast } from 'react-toastify';
+import { useContext, useState } from 'react';
 import Toast from '../components/Toast';
 import { AuthContext } from '../contexts/auth';
 import createAxiosInstance from '../axios';
@@ -8,11 +7,6 @@ const ForgotPassword = () => {
   const auth = useContext(AuthContext);
   const axios = createAxiosInstance(auth);
 
-  const notify = (type, message) => {
-    const types = ['info', 'success', 'error'];
-    const toastType = types.includes(type) ? type : 'info';
-    toast[toastType](message.toString());
-  };
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
   };

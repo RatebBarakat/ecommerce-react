@@ -1,3 +1,4 @@
+// eslint-disable-next-line react/prop-types
 export default function Loading({ centered, size }) {
     const containerClassName = centered ? 'flex items-center justify-center h-screen' : '';
     const spinnerSize = size === 'large' ? 'w-12 h-12' : 'w-6 h-6';

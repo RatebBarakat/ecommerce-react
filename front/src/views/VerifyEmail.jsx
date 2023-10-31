@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useContext } from 'react';
 import { AuthContext } from '../contexts/auth';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +12,7 @@ const VerifyEmail = () => {
 
   useEffect(() => {
     if(auth.isVerified) navigate('/admin/dashboard');
-  },[auth.user,auth.isLoading])
+  },[auth.user,auth.isLoading,auth.isVerified])
 
   const handleResendVerification = async () => {
     try {

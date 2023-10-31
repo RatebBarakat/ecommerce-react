@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom";
 import "./index.css";
 import { RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./contexts/auth.jsx";
@@ -11,7 +11,9 @@ import { ProfileProvider } from "./contexts/profile";
 import "react-toastify/dist/ReactToastify.css";
 import { CartProvider } from "./contexts/cart";
 
-ReactDOM.render(
+const root = createRoot(document.getElementById("root"));
+
+root.render(
   <React.StrictMode>
     <CartProvider>
       <AuthProvider>
@@ -21,6 +23,5 @@ ReactDOM.render(
         </ProfileProvider>
       </AuthProvider>
     </CartProvider>
-  </React.StrictMode>,
-  document.getElementById("root")
+  </React.StrictMode>
 );

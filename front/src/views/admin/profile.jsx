@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Input } from "../../components/input";
 import Toast from "../../components/Toast";
 import ErrorHelper from "../../helpers/errors";
@@ -8,7 +8,6 @@ import { ProfileContext } from "../../contexts/profile";
 import createAxiosInstance from "../../axios";
 
 export default function Profile() {
-  const [selectedFile, setSelectedFile] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [errors,setErrors] = useState([]);
@@ -24,7 +23,6 @@ export default function Profile() {
   });
   const [avatar, setAvatar] = useState(null);
   const useProfile = useContext(ProfileContext);
-  const [isFilePicked, setIsFilePicked] = useState(false);
 
   useEffect(() => {
     useProfile.profile
@@ -41,26 +39,11 @@ export default function Profile() {
           setIsLoading(false)
   }, []);
 
-  const error = (fieldName) => {
-    const fieldErrors = errors[fieldName];
-  
-    if (fieldErrors && fieldErrors.length > 0) {
-        console.log('fieldErrors[0] :>> ', fieldErrors[0]);
-      return (
-        <span className="text-red-600">
-          {fieldErrors[0]}
-        </span>
-      );
-    }
-  
-    return null;
-  };
 
   const changeHandler = (event) => {
     const file = event.target.files[0];
     setAvatar(file);
     setAvatar(file);
-    setIsFilePicked(true);
   };
 
   const handleSubmission = (event) => {

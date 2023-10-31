@@ -1,3 +1,4 @@
+// eslint-disable-next-line react/prop-types
 export const Input = ({error, style,label, type, value, onChange, placeholder,multiple }) => {
   return (
     <>

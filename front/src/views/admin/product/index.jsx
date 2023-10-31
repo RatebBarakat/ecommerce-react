@@ -1,5 +1,4 @@
-// Products.jsx
-import React, { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../../contexts/auth";
 import { Link, useNavigate } from "react-router-dom";
 import Toast from "../../../components/Toast";
@@ -24,7 +23,7 @@ const Products = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [numberofPages, setNumberOfPages] = useState(0);
   const [page, setPage] = useState(getInitialPage());
-  const [perPage, setPerPage] = useState(0);
+  // const [perPage, setPerPage] = useState(0);
 
   const changePage = ({ selected }) => {
     const newPage = selected + 1;
@@ -63,7 +62,7 @@ const Products = () => {
     }
     axios
       .delete(`/api/product/${id}`)
-      .then((response) => {
+      .then(() => {
         fetchProducts(1);
         Toast.notifyMessage("success", "product delted");
       })
@@ -83,7 +82,7 @@ const Products = () => {
     console.log("selected :>> ", selected);
     axios
       .post(`/api/product/deleteMany`, { ids: Array.from(selected) })
-      .then((response) => {
+      .then(() => {
         setSelected([]);
         fetchProducts(1);
         Toast.notifyMessage("success", "products delted");
@@ -94,6 +93,8 @@ const Products = () => {
           error.response?.data?.message,
           toString() ?? "cant delete"
         );
+      }).finally(() => {
+        setSelected([]);
       });
   };
 
@@ -107,7 +108,7 @@ const Products = () => {
     }
   };
 
-  const handleCheckboxChange = (event) => {
+  const handleCheckboxChange = useCallback((event) => {
     const productId = parseInt(event.target.value);
     console.log("productId :>> ", productId);
     const isChecked = event.target.checked;
@@ -119,25 +120,21 @@ const Products = () => {
         return prevSelected.filter((id) => id !== productId);
       }
     });
-  };
+  },[setSelected]);
 
   const isSelected = (productId) => {
     return selected.includes(productId);
   };
 
-  const handlePaginate = (page) => {
-    fetchProducts(page);
-  };
-
-  const handleSort = (sort) => {
-    setSort((prev) => prev !== sort ? sort : null);
-  };
+  const handleSort = useCallback((newSort) => {
+    setSort((prevSort) => (prevSort !== newSort ? newSort : null));
+  }, [setSort]);
 
   const handleEdit = (id) => {
     navigate(`/admin/products/edit/${id}`);
   };
 
-  const fetchProducts = async (forcePage = null) => {
+  const fetchProducts = useCallback(async (forcePage = null) => {
     !isLoading && setIsLoading(true);
     let paginateUrl = "api/product";
     let param = new URLSearchParams(location.search);
@@ -158,14 +155,13 @@ const Products = () => {
         console.log("response.data.data :>> ", response.data);
         setProducts(response.data.data);
         setNumberOfPages(response.data.meta.last_page);
-        setPerPage(response.data.meta.per_page);
         setLinks(response.data.meta);
         setIsLoading(false);
       })
-      .catch((error) => {
+      .catch(() => {
         setIsLoading(false);
       });
-  };
+  },[page,sort]) 
 
   useEffect(() => {
     if (!Permission.can(auth, "read-products")) {
@@ -173,7 +169,6 @@ const Products = () => {
         replace: true,
       });
     } else {
-      let params = new URLSearchParams(location.search);
       fetchProducts();
     }
   }, [auth.permissions]);
@@ -217,7 +212,7 @@ const Products = () => {
           {selected.length > 0 && (
             <button
               className="inline-block ml-3 rounded mt-3 bg-red-600 px-6 pb-2 pt-2.5 text-base font-medium leading-normal text-white"
-              onClick={(event) => handleDeleteMany()}
+              onClick={() => handleDeleteMany()}
             >
               delete selected
             </button>

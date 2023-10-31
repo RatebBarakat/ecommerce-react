@@ -13,7 +13,6 @@ export default function UpdateProduct() {
   const [temporaryImages, setTemporaryImages] = useState([]);
   let { id } = useParams();
   const auth = useContext(AuthContext);
-  const [tags, setTags] = useState([]);
   const axios = createAxiosInstance(auth);
   const navigate = useNavigate();
   const [progress, setProgress] = useState(0);
@@ -211,7 +210,7 @@ export default function UpdateProduct() {
           "Content-Type": "multipart/form-data",
         },
       })
-      .then((response) => {
+      .then(() => {
         navigate("/admin/products");
       })
       .catch((error) => {
@@ -338,8 +337,8 @@ export default function UpdateProduct() {
           </div>
           <div>
             <label
-              for="countries"
-              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              htmlFor="countries"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >
               Select an option
             </label>
@@ -349,12 +348,12 @@ export default function UpdateProduct() {
                 setProduct({ ...product, category_id: event.target.value })
               }
               id="countries"
-              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             >
               <option selected>Choose a country</option>
               {categories &&
                 categories.map((cat) => (
-                  <option value={cat.id}>{cat.name}</option>
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
             </select>
           </div>

@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Loading from "../../../components/Loading";
 import { Input } from "../../../components/input";
 import createAxiosInstance from "../../../axios";
@@ -9,14 +9,12 @@ import ErrorHelper from "../../../helpers/errors";
 
 export default function CreateProduct() {
   const [isLoading, setIsLoading] = useState(true);
-  const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [categories, setCategories] = useState([]);
   const auth = useContext(AuthContext);
-  const [tags, setTags] = useState([]);
   const axios = createAxiosInstance(auth);
   const navigate = useNavigate();
-  const [tagSuggestions, setTagSuggestions] = useState([]); // store tag suggestions based on name
+  const [tagSuggestions, setTagSuggestions] = useState([]); 
   const [product, setProduct] = useState({
     name: "",
     slug: "",
@@ -98,7 +96,7 @@ export default function CreateProduct() {
           "Content-Type": "multipart/form-data",
         },
       })
-      .then((response) => {
+      .then(() => {
         navigate("/admin/products");
       })
       .catch((error) => {
@@ -227,8 +225,8 @@ export default function CreateProduct() {
           </div>
           <div>
             <label
-              for="categories"
-              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              htmlFor="categories"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >
               Select a category
             </label>
@@ -238,12 +236,12 @@ export default function CreateProduct() {
                 setProduct({ ...product, category_id: event.target.value })
               }
               id="categories"
-              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             >
               <option selected>Choose a category</option>
               {categories &&
                 categories.map((cat) => (
-                  <option value={cat.id}>{cat.name}</option>
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
             </select>
           </div>
@@ -272,7 +270,7 @@ export default function CreateProduct() {
             </div>
           )}
           <button
-            disabled={processing || progress !== 0}
+            disabled={progress !== 0}
             className="group disabled:cursor-not-allowed disabled:!bg-indigo-400 relative py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white !bg-indigo-600 hover:!bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             type="submit"
             style={{ gridColumnStart: "1", gridColumnEnd: "3" }}

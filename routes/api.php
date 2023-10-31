@@ -40,6 +40,8 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     ]);
 });
 
+    Route::get('/category',[CategoryController::class,'index'])->name('user.category.index');
+
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::apiResource('/cart',CartController::class);
     Route::get('/counts', [DashboardController::class, 'index']);

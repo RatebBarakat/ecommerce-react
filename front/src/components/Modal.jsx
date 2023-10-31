@@ -1,14 +1,13 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   TERipple,
   TEModal,
   TEModalDialog,
   TEModalContent,
   TEModalHeader,
-  TEModalBody,
   TEModalFooter,
 } from 'tw-elements-react';
-
+// eslint-disable-next-line react/prop-types
 const Modal = ({ header, errors, identifier, showModal, toggleModal, onSubmit, children }) => {
   const [show, setShow] = useState(showModal);
 

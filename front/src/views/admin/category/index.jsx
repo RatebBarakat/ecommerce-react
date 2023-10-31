@@ -1,15 +1,11 @@
-// Categories.jsx
-import React, { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../../contexts/auth";
-import Loading from "../../../components/Loading";
 import Modal from "../../../components/Modal";
 import { useNavigate } from "react-router-dom";
 import Toast from "../../../components/Toast";
 import ErrorHelper from "../../../helpers/errors";
 import { Input } from "../../../components/input";
-import { formToJSON } from "axios";
 import Pagination from "../../../components/Pagination";
-import ReactPaginate from "react-paginate";
 import "tw-elements-react/dist/css/tw-elements-react.min.css";
 import Table from "../../../components/Table";
 import createAxiosInstance from "../../../axios";
@@ -34,7 +30,6 @@ const Categories = () => {
 
   const [page, setPage] = useState(getInitialPage);
 
-  const [perPage, setPerPage] = useState(0);
   const [errors, setErrors] = useState({
     add: {},
     edit: {},
@@ -111,7 +106,7 @@ const Categories = () => {
     resetErrors();
     axios
       .post(`/api/category`, form)
-      .then((response) => {
+      .then(() => {
         fetchCategories(1);
         resetInputs("add");
         setPage(1);
@@ -132,7 +127,7 @@ const Categories = () => {
         setEditForm(response.data.data);
         toggleEditModal();
       })
-      .catch((error) => {
+      .catch(() => {
         Toast.notifyMessage("an error occur");
       });
   };
@@ -140,7 +135,7 @@ const Categories = () => {
   const handleEditSubmit = () => {
     axios
       .put(`/api/category/${editForm.id}`, editForm)
-      .then((response) => {
+      .then(() => {
         fetchCategories(page);
         resetInputs("edit");
         toggleEditModal();
@@ -158,7 +153,7 @@ const Categories = () => {
     }
     axios
       .delete(`/api/category/${id}`)
-      .then((response) => {
+      .then(() => {
         fetchCategories(1);
         Toast.notifyMessage("success", "category delted");
       })
@@ -171,9 +166,12 @@ const Categories = () => {
       });
   };
 
-  const handleSort = (sort) => {
-    setSort((prev) => prev !== sort ? sort : null);
-  };
+  const handleSort = useCallback(
+    (newSort) => {
+      setSort((prevSort) => (prevSort !== newSort ? newSort : null));
+    },
+    [setSort]
+  );
 
   const handleDeleteMany = () => {
     if (!confirm("are you sure you want to delete selected categories")) {
@@ -181,7 +179,7 @@ const Categories = () => {
     }
     axios
       .post(`/api/category/deleteMany`, { ids: Array.from(selected) })
-      .then((response) => {
+      .then(() => {
         fetchCategories(1);
         Toast.notifyMessage("success", "category delted");
       })
@@ -191,6 +189,8 @@ const Categories = () => {
           error.response?.data?.message,
           toString() ?? "cant delete"
         );
+      }).finally(() => {
+        setSelected([]);
       });
   };
 
@@ -204,55 +204,52 @@ const Categories = () => {
     }
   };
 
-  const handleCheckboxChange = (event) => {
-    const categoryId = parseInt(event.target.value);
+  const handleCheckboxChange = useCallback((event) => {
+    const categoryid = parseInt(event.target.value);
     const isChecked = event.target.checked;
 
     setSelected((prevSelected) => {
       if (isChecked) {
-        return [...prevSelected, categoryId];
+        return [...prevSelected, categoryid];
       } else {
-        return prevSelected.filter((id) => id !== categoryId);
+        return prevSelected.filter((id) => id !== categoryid);
       }
     });
-  };
+  },[setSelected]);
 
   const isSelected = (categoryId) => {
     return selected.includes(categoryId);
   };
 
-  const handlePaginate = (page) => {
-    fetchCategories(page);
-  };
+  const fetchCategories = useCallback( async (forcePage = null) => {
+      !isLoading && setIsLoading(true);
+      let paginateUrl = "api/category";
+      let param = new URLSearchParams(location.search);
 
-  const fetchCategories = async (forcePage = null) => {
-    !isLoading && setIsLoading(true);
-    let paginateUrl = "api/category";
-    let param = new URLSearchParams(location.search);
+      forcePage && setPage(forcePage);
 
-    forcePage && setPage(forcePage);
+      param.set("page", forcePage || page);
 
-    param.set("page", forcePage || page);
+      if (sort !== null) {
+        param.set("sort", sort);
+      }
 
-    if (sort !== null) {
-      param.set("sort", sort);
-    }
+      paginateUrl += `?${param.toString()}`;
 
-    paginateUrl += `?${param.toString()}`;
-
-    axios
-      .get(paginateUrl)
-      .then((response) => {
-        setCategories(response.data.data);
-        setNumberOfPages(response.data.meta.last_page);
-        setPerPage(response.data.meta.per_page);
-        setLinks(response.data.meta);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        setIsLoading(false);
-      });
-  };
+      axios
+        .get(paginateUrl)
+        .then((response) => {
+          setCategories(response.data.data);
+          setNumberOfPages(response.data.meta.last_page);
+          setLinks(response.data.meta);
+          setIsLoading(false);
+        })
+        .catch(() => {
+          setIsLoading(false);
+        });
+    },
+    [page, sort,isLoading]
+  );
 
   useEffect(() => {
     if (!Permission.can(auth, "read-categories")) {
@@ -283,7 +280,7 @@ const Categories = () => {
           {selected.length > 0 && (
             <button
               className="inline-block ml-3 rounded mt-3 bg-red-600 px-6 pb-2 pt-2.5 text-base font-medium leading-normal text-white"
-              onClick={(event) => handleDeleteMany()}
+              onClick={() => handleDeleteMany()}
             >
               delete selected
             </button>

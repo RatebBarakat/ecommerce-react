@@ -1,15 +1,11 @@
-// Tags.jsx
-import React, { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../../contexts/auth";
-import Loading from "../../../components/Loading";
 import Modal from "../../../components/Modal";
 import { useNavigate } from "react-router-dom";
 import Toast from "../../../components/Toast";
 import ErrorHelper from "../../../helpers/errors";
 import { Input } from "../../../components/input";
-import { formToJSON } from "axios";
 import Pagination from "../../../components/Pagination";
-import ReactPaginate from "react-paginate";
 import "tw-elements-react/dist/css/tw-elements-react.min.css";
 import Table from "../../../components/Table";
 import createAxiosInstance from "../../../axios";
@@ -32,7 +28,6 @@ const Tags = () => {
   const [showEditModal, setEditShowModal] = useState(false);
   const [numberofPages, setNumberOfPages] = useState(0);
   const [page, setPage] = useState(getInitialPage);
-  const [perPage, setPerPage] = useState(0);
   const [errors, setErrors] = useState({
     add: {},
     edit: {},
@@ -51,9 +46,9 @@ const Tags = () => {
     fetchTags(newPage);
   };
 
-  const handleSort = (sort) => {
-    setSort((prev) => prev !== sort ? sort : null);
-  };
+  const handleSort = useCallback((newSort) => {
+    setSort((prevSort) => (prevSort !== newSort ? newSort : null));
+  }, [setSort]);
 
   useEffect(() => {
     let params = new URLSearchParams(location.search);
@@ -100,7 +95,7 @@ const Tags = () => {
     resetErrors();
     axios
       .post(`/api/tag`, form)
-      .then((response) => {
+      .then(() => {
         fetchTags(1);
         resetInputs("add");
         setPage(1);
@@ -121,7 +116,7 @@ const Tags = () => {
         setEditForm(response.data.data);
         toggleEditModal();
       })
-      .catch((error) => {
+      .catch(() => {
         Toast.notifyMessage("an error occur");
       });
   };
@@ -129,7 +124,7 @@ const Tags = () => {
   const handleEditSubmit = () => {
     axios
       .put(`/api/tag/${editForm.id}`, editForm)
-      .then((response) => {
+      .then(() => {
         fetchTags(page);
         resetInputs("edit");
         toggleEditModal();
@@ -147,7 +142,7 @@ const Tags = () => {
     }
     axios
       .delete(`/api/tag/${id}`)
-      .then((response) => {
+      .then(() => {
         fetchTags(1);
         Toast.notifyMessage("success", "tag delted");
       })
@@ -165,7 +160,7 @@ const Tags = () => {
     }
     axios
       .post(`/api/tag/deleteMany`, { ids: Array.from(selected) })
-      .then((response) => {
+      .then(() => {
         fetchTags(1);
         Toast.notifyMessage("success", "tag delted");
       })
@@ -175,6 +170,8 @@ const Tags = () => {
           error.response?.data?.message,
           toString() ?? "cant delete"
         );
+      }).finally(() => {
+        setSelected([]);
       });
   };
 
@@ -188,28 +185,24 @@ const Tags = () => {
     }
   };
 
-  const handleCheckboxChange = (event) => {
-    const tagId = parseInt(event.target.value);
+  const handleCheckboxChange = useCallback((event) => {
+    const productId = parseInt(event.target.value);
     const isChecked = event.target.checked;
 
     setSelected((prevSelected) => {
       if (isChecked) {
-        return [...prevSelected, tagId];
+        return [...prevSelected, productId];
       } else {
-        return prevSelected.filter((id) => id !== tagId);
+        return prevSelected.filter((id) => id !== productId);
       }
     });
-  };
+  },[setSelected]);
 
   const isSelected = (tagId) => {
     return selected.includes(tagId);
   };
 
-  const handlePaginate = (page) => {
-    fetchTags(page);
-  };
-
-  const fetchTags = async (forcePage = null) => {
+  const fetchTags = useCallback( async (forcePage = null) => {
     !isLoading && setIsLoading(true);
     let paginateUrl = "api/tag";
     let param = new URLSearchParams(location.search);
@@ -233,10 +226,10 @@ const Tags = () => {
         setLinks(response.data.meta);
         setIsLoading(false);
       })
-      .catch((error) => {
+      .catch(() => {
         setIsLoading(false);
       });
-  };
+  },[page,sort])
 
   useEffect(() => {
     if (!Permission.can(auth, "read-tags")) {
@@ -264,7 +257,7 @@ const Tags = () => {
           {selected.length > 0 && (
             <button
               className="inline-block ml-3 rounded mt-3 bg-red-600 px-6 pb-2 pt-2.5 text-base font-medium leading-normal text-white"
-              onClick={(event) => handleDeleteMany()}
+              onClick={() => handleDeleteMany()}
             >
               delete selected
             </button>

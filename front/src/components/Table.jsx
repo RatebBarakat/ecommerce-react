@@ -1,21 +1,9 @@
-import React, { useContext } from "react";
+/* eslint-disable react/prop-types */
+import { useContext } from "react";
 import Loading from "./Loading";
 import { AuthContext } from "../contexts/auth";
 
-export default function Table({
-  columns,
-  data,
-  selected,
-  canEdit,
-  canDelete,
-  handleEdit,
-  handleDelete,
-  handleCheckboxChange,
-  isSelected,
-  handleSelectAll,
-  isLoading,
-  handleSort,
-}) {
+export default function Table({columns,data,selected,canEdit,canDelete,handleEdit,handleDelete,handleCheckboxChange,isSelected,handleSelectAll,isLoading,handleSort,}) {
   const auth = useContext(AuthContext);
 
   const getNestedValue = (item, dataField) => {
@@ -49,7 +37,7 @@ export default function Table({
                   className={`px-4 text-sm ${
                     column["sortable"] ? "cursor-pointer" : ""
                   }`}
-                  onClick={(event) => {
+                  onClick={() => {
                     if (column["sortable"]) {
                       handleSort(column.dataField);
                     }

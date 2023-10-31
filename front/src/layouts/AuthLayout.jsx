@@ -1,11 +1,9 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Link, Navigate, Outlet, useNavigate } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/auth";
 import Loading from "../components/Loading";
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
-
 import { ProfileContext } from "../contexts/profile";
 import Cookies from "js-cookie";
 import Toast from "../components/Toast";
@@ -17,19 +15,13 @@ export default function AuthLayout() {
   const profile = useContext(ProfileContext);
   const [avatar, setAvatar] = useState();
 
-  profile.profile &&
+
     useEffect(() => {
       setAvatar(profile.profile?.avatar || null);
       if(profile.profile?.avatar && document.getElementById('avatar')){
         document.getElementById('avatar').src = profile.profile?.avatar;
       }
     }, [profile.isLoading]);
-
-  const [isDropDownOpen, setIsDropDownOpen] = useState(false);
-
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
 
   function classNames(...classes) {
     return classes.filter(Boolean).join(" ");
@@ -62,7 +54,7 @@ export default function AuthLayout() {
       }
     };
     fetchUserAndRedirect();
-  }, [auth.isLoading]);
+  }, [auth.isLoading,auth.isVerified,auth.isVerified,auth.user]);
 
   if (auth.isLoading) {
     return <Loading centered={true} size={"large"} />;

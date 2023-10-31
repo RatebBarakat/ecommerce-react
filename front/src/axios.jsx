@@ -1,5 +1,4 @@
 import Axios from 'axios';
-import Toast from './components/Toast';
 
 const createAxiosInstance = (authContext = null) => {
   const axios = Axios.create({

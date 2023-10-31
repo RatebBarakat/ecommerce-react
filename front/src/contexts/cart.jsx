@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import createAxiosInstance from "../axios";
 
 const CartContext = createContext({});
