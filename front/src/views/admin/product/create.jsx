@@ -16,7 +16,7 @@ export default function CreateProduct() {
   const [tags, setTags] = useState([]);
   const axios = createAxiosInstance(auth);
   const navigate = useNavigate();
-  const [tagSuggestions, setTagSuggestions] = useState([]); // Store tag suggestions based on name
+  const [tagSuggestions, setTagSuggestions] = useState([]); // store tag suggestions based on name
   const [product, setProduct] = useState({
     name: "",
     slug: "",

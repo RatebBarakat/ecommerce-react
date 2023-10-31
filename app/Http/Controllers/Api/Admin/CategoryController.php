@@ -12,6 +12,7 @@ use App\Models\Category;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class CategoryController extends Controller
@@ -32,13 +33,18 @@ class CategoryController extends Controller
     
     public function index()
     {
-        if (Gate::denies("read-categories")) abort(403, 'you cannt read categories');
+        $this->authorize('read-categories');
+        $validColumns = DB::getSchemaBuilder()->getColumnListing('categories');
+
+        $sort = in_array(request('sort'), $validColumns) ? request('sort') : 'id';
+
         return CategoryResource::collection(
             request()->get('type') === "all" ?
-                Cache::remember('categories', Carbon::now()->addDay(), function () {
-                    return Category::orderBy('id', 'desc')->get(['id', 'name']);
+                Cache::remember('categories', Carbon::now()->addDay(), function () use($sort) {
+                    return Category::orderBy('id', 'desc')
+                    ->get(['id', 'name']);
                 })
-                : Category::orderBy('id', 'desc')->paginate(10)
+                : Category::orderBy($sort, $sort == 'id' ? 'desc' : 'asc')->paginate(10)
         );
     }
 
@@ -63,7 +69,7 @@ class CategoryController extends Controller
 
     public function destroy(Request $request, Category $category)
     {
-        abort_if(Gate::denies('delete-categories'), 403);
+        $this->authorize('delete-categories');
         $category->delete();
         return $this->successResponse(message: 'category deleted successfully');
     }

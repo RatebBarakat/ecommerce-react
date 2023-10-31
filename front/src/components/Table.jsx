@@ -14,6 +14,7 @@ export default function Table({
   isSelected,
   handleSelectAll,
   isLoading,
+  handleSort,
 }) {
   const auth = useContext(AuthContext);
 
@@ -43,7 +44,17 @@ export default function Table({
             </th>
             {Array.from(columns).map((column, index) => (
               <>
-                <td key={index} className="px-4 text-sm">
+                <td
+                  key={index}
+                  className={`px-4 text-sm ${
+                    column["sortable"] ? "cursor-pointer" : ""
+                  }`}
+                  onClick={(event) => {
+                    if (column["sortable"]) {
+                      handleSort(column.dataField);
+                    }
+                  }}
+                >
                   {column["title"]}
                 </td>
               </>

@@ -33,7 +33,7 @@ class ProductController extends Controller
 
         $uploadedImages = [];
 
-        if(!$request->file('images')) return response()->nocontent();
+        if (!$request->file('images')) return response()->nocontent();
 
         foreach ($request->file('images') as $file) {
             $media = $product->addMedia($file)->toMediaCollection('images');
@@ -52,21 +52,21 @@ class ProductController extends Controller
             'ids' => 'array',
             'ids.*' => 'exists:products,id'
         ]);
-    
+
         $products = Product::whereIn('id', $request->ids)->get();
-    
+
         foreach ($products as $product) {
             $media = $product->getMedia('images');
             foreach ($media as $image) {
                 $image->delete();
             }
         }
-    
+
         Product::query()->whereIn('id', $request->ids)->delete();
-    
-        return $this->successResponse(message : 'Products and associated images deleted successfully');
+
+        return $this->successResponse(message: 'Products and associated images deleted successfully');
     }
-    
+
 
     public function deleteImage(Request $request)
     {
@@ -83,15 +83,22 @@ class ProductController extends Controller
     }
     public function index()
     {
-        if (Gate::denies("read-products")) abort(403, 'you cannt read products');
-        return ProductResource::collection(Product::orderBy('id', 'desc')->paginate(10));
+        $this->authorize('read-products');
+
+        $validColumns = DB::getSchemaBuilder()->getColumnListing('products');
+
+        $sort = in_array(request('sort'), $validColumns) ? request('sort') : 'id';
+
+        return ProductResource::collection(
+            Product::orderBy($sort, $sort == 'id' ? 'desc' : 'asc')->paginate(10)
+        );
     }
 
     public function store(CreateProductRequest $createProductRequest)
     {
         $validatedData = $createProductRequest->validated();
-        unset($validatedData['images'],$validatedData['tags']);
-        
+        unset($validatedData['images'], $validatedData['tags']);
+
         $product = Product::create($validatedData);
 
         $product->tags()->sync($createProductRequest->tags);
@@ -122,7 +129,7 @@ class ProductController extends Controller
         try {
             $validatedData = $updateProductRequest->validated();
 
-            unset($validatedData['images'],$validatedData['tags']);
+            unset($validatedData['images'], $validatedData['tags']);
 
             $product->update($validatedData);
 
@@ -130,7 +137,7 @@ class ProductController extends Controller
 
             DB::commit();
 
-            return $this->successResponse(message : 'Product updated successfully');
+            return $this->successResponse(message: 'Product updated successfully');
         } catch (\Exception $e) {
             DB::rollBack();
 

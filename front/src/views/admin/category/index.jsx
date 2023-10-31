@@ -15,9 +15,15 @@ import Table from "../../../components/Table";
 import createAxiosInstance from "../../../axios";
 import { Permission } from "../../../helpers/permissions";
 
+const getInitialPage = () => {
+  let page = new URLSearchParams(location.search).get("page");
+  return page !== null && !isNaN(page) && page > 0 ? parseInt(page) : 1;
+};
+
 const Categories = () => {
   const axios = createAxiosInstance();
   const auth = useContext(AuthContext);
+  const [sort, setSort] = useState(null);
   const [categories, setCategories] = useState([]);
   const [selected, setSelected] = useState([]);
   const [links, setLinks] = useState([]);
@@ -25,9 +31,9 @@ const Categories = () => {
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setEditShowModal] = useState(false);
   const [numberofPages, setNumberOfPages] = useState(0);
-  const [page, setPage] = useState(
-    new URLSearchParams(location.search).get("page") || 1
-  );
+
+  const [page, setPage] = useState(getInitialPage);
+
   const [perPage, setPerPage] = useState(0);
   const [errors, setErrors] = useState({
     add: {},
@@ -60,14 +66,26 @@ const Categories = () => {
 
   useEffect(() => {
     let params = new URLSearchParams(location.search);
-    if (page != 1) {
+    if (page !== 1 && typeof page === "number" && page > 0) {
       params.set("page", page);
       navigate(`?${params.toString()}`);
     } else {
       params.delete("page");
-      navigate(``);
+      navigate(`?${params.toString()}`);
     }
   }, [page]);
+
+  useEffect(() => {
+    let params = new URLSearchParams(location.search);
+    if (sort != null) {
+      params.set("sort", sort);
+      navigate(`?${params.toString()}`);
+    } else {
+      params.delete("sort");
+      navigate(`?${params.toString()}`);
+    }
+    fetchCategories();
+  }, [sort]);
 
   const navigate = useNavigate();
 
@@ -152,6 +170,11 @@ const Categories = () => {
         );
       });
   };
+
+  const handleSort = (sort) => {
+    setSort((prev) => prev !== sort ? sort : null);
+  };
+
   const handleDeleteMany = () => {
     if (!confirm("are you sure you want to delete selected categories")) {
       return;
@@ -202,13 +225,21 @@ const Categories = () => {
     fetchCategories(page);
   };
 
-  const fetchCategories = async (page = null) => {
+  const fetchCategories = async (forcePage = null) => {
     !isLoading && setIsLoading(true);
-    page !== null && setPage(page);
     let paginateUrl = "api/category";
-    if (page !== null) {
-      paginateUrl += `?page=${page}`;
+    let param = new URLSearchParams(location.search);
+
+    forcePage && setPage(forcePage);
+
+    param.set("page", forcePage || page);
+
+    if (sort !== null) {
+      param.set("sort", sort);
     }
+
+    paginateUrl += `?${param.toString()}`;
+
     axios
       .get(paginateUrl)
       .then((response) => {
@@ -235,8 +266,8 @@ const Categories = () => {
   }, [auth.permissions]);
 
   const columns = [
-    { title: "Name", dataField: "name" },
-    { title: "Slug", dataField: "slug" },
+    { title: "Name", dataField: "name", sortable: true },
+    { title: "Slug", dataField: "slug", sortable: true },
   ];
 
   return (
@@ -270,6 +301,7 @@ const Categories = () => {
           handleSelectAll={handleSelectAll}
           isSelected={isSelected}
           isLoading={isLoading}
+          handleSort={handleSort}
         />
         {Object.keys(links).length > 0 && (
           <Pagination

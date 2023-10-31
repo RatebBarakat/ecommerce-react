@@ -15,19 +15,23 @@ import Table from "../../../components/Table";
 import createAxiosInstance from "../../../axios";
 import { Permission } from "../../../helpers/permissions";
 
+const getInitialPage = () => {
+  let page = new URLSearchParams(location.search).get("page");
+  return page !== null && !isNaN(page) && page > 0 ? parseInt(page) : 1;
+};
+
 const Tags = () => {
   const axios = createAxiosInstance();
   const auth = useContext(AuthContext);
   const [tags, setTags] = useState([]);
+  const [sort, setSort] = useState(null);
   const [selected, setSelected] = useState([]);
   const [links, setLinks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setEditShowModal] = useState(false);
   const [numberofPages, setNumberOfPages] = useState(0);
-  const [page, setPage] = useState(
-    new URLSearchParams(location.search).get("page") || 1
-  );
+  const [page, setPage] = useState(getInitialPage);
   const [perPage, setPerPage] = useState(0);
   const [errors, setErrors] = useState({
     add: {},
@@ -47,16 +51,32 @@ const Tags = () => {
     fetchTags(newPage);
   };
 
+  const handleSort = (sort) => {
+    setSort((prev) => prev !== sort ? sort : null);
+  };
+
   useEffect(() => {
-    let params = new URLSearchParams();
+    let params = new URLSearchParams(location.search);
     if (page != 1) {
       params.set("page", page);
       navigate(`?${params.toString()}`);
     } else {
       params.delete("page");
-      navigate(``);
+      navigate(`?${params.toString()}`);
     }
   }, [page]);
+
+  useEffect(() => {
+    let params = new URLSearchParams(location.search);
+    if (sort != null) {
+      params.set("sort", sort);
+      navigate(`?${params.toString()}`);
+    } else {
+      params.delete("sort");
+      navigate(`?${params.toString()}`);
+    }
+    fetchTags();
+  }, [sort]);
 
   const navigate = useNavigate();
 
@@ -189,13 +209,21 @@ const Tags = () => {
     fetchTags(page);
   };
 
-  const fetchTags = async (page = null) => {
+  const fetchTags = async (forcePage = null) => {
     !isLoading && setIsLoading(true);
-    page !== null && page !== 1 && setPage(page);
     let paginateUrl = "api/tag";
-    if (page !== null && page !== 1) {
-      paginateUrl += `?page=${page}`;
+    let param = new URLSearchParams(location.search);
+
+    forcePage && setPage(forcePage);
+
+    param.set("page", forcePage || page);
+
+    if (sort !== null) {
+      param.set("sort", sort);
     }
+
+    paginateUrl += `?${param.toString()}`;
+
     axios
       .get(paginateUrl)
       .then((response) => {
@@ -221,7 +249,7 @@ const Tags = () => {
     }
   }, [auth.permissions]);
 
-  const columns = [{ title: "Name", dataField: "name" }];
+  const columns = [{ title: "Name", dataField: "name", sortable: true }];
 
   return (
     <>
@@ -235,8 +263,9 @@ const Tags = () => {
           </button>
           {selected.length > 0 && (
             <button
-            className="inline-block ml-3 rounded mt-3 bg-red-600 px-6 pb-2 pt-2.5 text-base font-medium leading-normal text-white"
-            onClick={(event) => handleDeleteMany()}>
+              className="inline-block ml-3 rounded mt-3 bg-red-600 px-6 pb-2 pt-2.5 text-base font-medium leading-normal text-white"
+              onClick={(event) => handleDeleteMany()}
+            >
               delete selected
             </button>
           )}
@@ -253,6 +282,7 @@ const Tags = () => {
           handleSelectAll={handleSelectAll}
           isSelected={isSelected}
           isLoading={isLoading}
+          handleSort={handleSort}
         />
         {Object.keys(links).length > 0 && (
           <Pagination
