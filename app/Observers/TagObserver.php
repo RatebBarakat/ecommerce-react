@@ -14,7 +14,6 @@ class TagObserver
 
     protected function deleteCached() {
         Cache::forget("tags");
-        Log::info("cached tags deleted");
     }
     public function created(Tag $tag): void
     {
