@@ -19,11 +19,15 @@ class DatabaseSeeder extends Seeder
 
         $this->call(RoleSeeder::class);
         $this->call(PermissionSeeder::class);
+        $this->call(CategorySeeder::class);
+        $this->call(TagSeeder::class);
+        $this->call(ProductSeeder::class);
         
         \App\Models\User::create([
             'name' => 'rateb',
             'email' => 'rateb@example.com',
             'password' => Hash::make('rateb2022'),
+            'email_verified_at' => now(),
             'role_id' => 1,
         ]);
     }
