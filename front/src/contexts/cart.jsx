@@ -29,7 +29,7 @@ const CartProvider = ({ children }) => {
   };
 
   const isInCart = (id) => {
-    if (carts.length === 0) return true;
+    if (carts.length === 0) return false;
     return carts.some((cart) => cart.product.id === id);
   };
 
