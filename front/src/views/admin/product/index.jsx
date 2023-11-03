@@ -8,12 +8,12 @@ import Table from "../../../components/Table";
 import createAxiosInstance from "../../../axios";
 import { Permission } from "../../../helpers/permissions";
 
-const getInitialPage = () => {
-  let page = new URLSearchParams(location.search).get("page");
-  return page !== null && !isNaN(page) && page > 0 ? parseInt(page) : 1;
-};
-
 const Products = () => {
+  const getInitialPage = () => {
+    let page = new URLSearchParams(location.search).get("page");
+    return page !== null && !isNaN(page) && page > 0 ? parseInt(page) : 1;
+  };
+
   const auth = useContext(AuthContext);
   const axios = createAxiosInstance(auth);
   const [products, setProducts] = useState([]);
@@ -42,6 +42,8 @@ const Products = () => {
       params.delete("page");
       navigate(`?${params.toString()}`);
     }
+
+    return console.log("page changed finish", page);
   }, [page]);
 
   useEffect(() => {
@@ -53,7 +55,7 @@ const Products = () => {
       params.delete("sort");
       navigate(`?${params.toString()}`);
     }
-    fetchProducts();
+    return console.log("sort changed finish", sort);
   }, [sort]);
 
   const handleDelete = (id) => {
@@ -93,7 +95,8 @@ const Products = () => {
           error.response?.data?.message,
           toString() ?? "cant delete"
         );
-      }).finally(() => {
+      })
+      .finally(() => {
         setSelected([]);
       });
   };
@@ -108,70 +111,81 @@ const Products = () => {
     }
   };
 
-  const handleCheckboxChange = useCallback((event) => {
-    const productId = parseInt(event.target.value);
-    console.log("productId :>> ", productId);
-    const isChecked = event.target.checked;
+  const handleCheckboxChange = useCallback(
+    (event) => {
+      const productId = parseInt(event.target.value);
+      console.log("productId :>> ", productId);
+      const isChecked = event.target.checked;
 
-    setSelected((prevSelected) => {
-      if (isChecked) {
-        return [...prevSelected, productId];
-      } else {
-        return prevSelected.filter((id) => id !== productId);
-      }
-    });
-  },[setSelected]);
+      setSelected((prevSelected) => {
+        if (isChecked) {
+          return [...prevSelected, productId];
+        } else {
+          return prevSelected.filter((id) => id !== productId);
+        }
+      });
+    },
+    [setSelected]
+  );
 
   const isSelected = (productId) => {
     return selected.includes(productId);
   };
 
-  const handleSort = useCallback((newSort) => {
+  const handleSort = (newSort) => {
     setSort((prevSort) => (prevSort !== newSort ? newSort : null));
-  }, [setSort]);
+    fetchProducts(page, newSort);
+  };
 
   const handleEdit = (id) => {
     navigate(`/admin/products/edit/${id}`);
   };
 
-  const fetchProducts = useCallback(async (forcePage = null) => {
-    !isLoading && setIsLoading(true);
-    let paginateUrl = "api/product";
-    let param = new URLSearchParams(location.search);
+  const fetchProducts = async (forcePage = null, sort = null) => {
+      !isLoading && setIsLoading(true);
+      let paginateUrl = "api/product";
+      let param = new URLSearchParams(location.search);
 
-    forcePage && setPage(forcePage);
+      forcePage && setPage(forcePage);
 
-    param.set("page", forcePage || page);
+      param.set("page", forcePage || page);
 
-    if (sort !== null) {
-      param.set("sort", sort);
-    }
+      if (sort !== null) {
+        param.set("sort", sort);
+      }
 
-    paginateUrl += `?${param.toString()}`;
-
-    axios
-      .get(paginateUrl)
-      .then((response) => {
-        console.log("response.data.data :>> ", response.data);
-        setProducts(response.data.data);
-        setNumberOfPages(response.data.meta.last_page);
-        setLinks(response.data.meta);
-        setIsLoading(false);
-      })
-      .catch(() => {
-        setIsLoading(false);
-      });
-  },[page,sort]) 
+      paginateUrl += `?${param.toString()}`;
+      axios.get(paginateUrl)
+        .then((response) => {
+          console.log("response.data.data :>> ", response.data);
+          setProducts(response.data.data);
+          setNumberOfPages(response.data.meta.last_page);
+          setLinks(response.data.meta);
+          setIsLoading(false);
+        })
+        .catch(() => {
+          setIsLoading(false);
+        });
+    };
 
   useEffect(() => {
+    const CheckPoducts = async () => {
+      if (products.length == 0) {
+        await fetchProducts();
+      }
+    }
     if (!Permission.can(auth, "read-products")) {
       return navigate("/admin/dashboard", {
         replace: true,
       });
     } else {
-      fetchProducts();
+      CheckPoducts();
     }
-  }, [auth.permissions]);
+
+    return () => {
+      console.log("Products component unmounted");
+    };
+  }, []);
 
   const columns = [
     { title: "Name", dataField: "name", sortable: true },

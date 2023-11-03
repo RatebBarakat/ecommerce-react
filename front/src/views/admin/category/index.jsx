@@ -75,11 +75,11 @@ const Categories = () => {
     if (sort != null) {
       params.set("sort", sort);
       navigate(`?${params.toString()}`);
+      fetchCategories();
     } else {
       params.delete("sort");
       navigate(`?${params.toString()}`);
     }
-    fetchCategories();
   }, [sort]);
 
   const navigate = useNavigate();
@@ -260,7 +260,7 @@ const Categories = () => {
       let params = new URLSearchParams(location.search);
       params.get("page") ? fetchCategories(page) : fetchCategories();
     }
-  }, [auth.permissions]);
+  }, []);
 
   const columns = [
     { title: "Name", dataField: "name", sortable: true },

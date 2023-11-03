@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import axios from "../axios";
 import Cookies from "js-cookie";
 import createAxiosInstance from "../axios";
 
@@ -48,6 +47,7 @@ const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    console.log('user :>> ', user);
     if (!user) {
       fetchUser();
     }
@@ -66,6 +66,5 @@ const AuthProvider = ({ children }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-const useAuth = () => useContext(AuthContext);
 
-export { AuthProvider, AuthContext, useAuth };
+export { AuthProvider, AuthContext };

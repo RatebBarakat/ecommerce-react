@@ -58,7 +58,7 @@ export default function UpdateProduct() {
             }) || []
           ),
         });
-        setTemporaryImages(data.images);
+        setTemporaryImages(data.images || []);
       })
       .catch((error) => {
         if (error.response.status === 404) {
@@ -124,7 +124,7 @@ export default function UpdateProduct() {
   const handleFileUpload = async (event) => {
     const files = Array.from(event.target.files);
 
-    if (temporaryImages.length + files.length > 5) {
+    if (Array.from(temporaryImages).length + files.length > 5) {
       Toast.notifyMessage(
         "error",
         "you cannot upload more than  images for single product"
@@ -370,7 +370,7 @@ export default function UpdateProduct() {
             className="flex gap-2 flex-wrap w-full"
             style={{ gridColumnStart: "1", gridColumnEnd: "3" }}
           >
-            {temporaryImages.map((image) => (
+            {temporaryImages && temporaryImages.map((image) => (
               <div key={image.id ?? image.url} className="image-container">
                 <img className="w-14 h-14" src={image.url} alt="display" />
                 <button

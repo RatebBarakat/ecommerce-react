@@ -238,7 +238,7 @@ const Tags = () => {
       });
     } else {
       let params = new URLSearchParams(location.search);
-      params.get("page") !== 1 ? fetchTags(page) : fetchTags();
+      !tags.length < 1 && params.get("page") !== 1 ? fetchTags(page) : fetchTags();
     }
   }, [auth.permissions]);
 
