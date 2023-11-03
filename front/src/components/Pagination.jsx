@@ -4,7 +4,6 @@ export default function Pagination({ page, numberofPages, changePage }) {
   return (
     <ReactPaginate
       pageCount={numberofPages}
-      initialPage={0}
       forcePage={page - 1}
       pageRangeDisplayed={2}
       marginPagesDisplayed={3}

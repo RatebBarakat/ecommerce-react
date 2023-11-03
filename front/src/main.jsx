@@ -1,4 +1,3 @@
-import React from "react";
 import { createRoot } from "react-dom";
 import "./index.css";
 import { RouterProvider } from "react-router-dom";
@@ -14,7 +13,6 @@ import { CartProvider } from "./contexts/cart";
 const root = createRoot(document.getElementById("root"));
 
 root.render(
-  <React.StrictMode>
     <CartProvider>
       <AuthProvider>
         <ProfileProvider>
@@ -23,5 +21,4 @@ root.render(
         </ProfileProvider>
       </AuthProvider>
     </CartProvider>
-  </React.StrictMode>
 );

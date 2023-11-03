@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\ProductController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CategoryController as UserCategoryController;
 use App\Http\Controllers\TagController;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\Role;
@@ -40,7 +41,9 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     ]);
 });
 
-    Route::get('/category',[CategoryController::class,'index'])->name('user.category.index');
+Route::prefix('user')->group(function () {
+    Route::get('/category',[UserCategoryController::class,'index'])->name('user.category.index');
+});
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::apiResource('/cart',CartController::class);
