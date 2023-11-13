@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('role-permission', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('role_id')->constrained('roles')->cascadeOnDelete();
-            $table->foreignId('permission_id')->constrained('permissions')->cascadeOnDelete();
+            $table->foreignId('role_id')->index()->constrained('roles')->cascadeOnDelete();
+            $table->foreignId('permission_id')->index()->constrained('permissions')->cascadeOnDelete();
             $table->timestamps();
         });
     }
