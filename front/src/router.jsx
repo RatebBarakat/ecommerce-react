@@ -17,6 +17,7 @@ import CreateProduct from "./views/admin/product/create";
 import Updateproduct from "./views/admin/product/update";
 import Tags from "./views/admin/tag";
 import AdminLayout from "./layouts/AdminLayout";
+import Cart from "./views/cart";
 
 const router = createBrowserRouter([
     {
@@ -98,6 +99,10 @@ const router = createBrowserRouter([
             {
                 path: 'verify',
                 element: <VerifyEmail />
+            },
+            {
+                path: 'cart',
+                element: <Cart />
             },
         ]
     },

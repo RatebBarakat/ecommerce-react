@@ -6,6 +6,7 @@ import { AuthContext } from "../../../contexts/auth";
 import Toast from "../../../components/Toast";
 import createAxiosInstance from "../../../axios";
 import Select from "react-select";
+import Discount from "../../../components/Discount";
 
 export default function UpdateProduct() {
   const [isLoading, setIsLoading] = useState(true);
@@ -15,6 +16,7 @@ export default function UpdateProduct() {
   const auth = useContext(AuthContext);
   const axios = createAxiosInstance(auth);
   const navigate = useNavigate();
+  const [discounts, setDiscounts] = useState([]);
   const [progress, setProgress] = useState(0);
   const [categories, setCategories] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
@@ -57,7 +59,10 @@ export default function UpdateProduct() {
               };
             }) || []
           ),
+          discounts: data.discounts,
         });
+        setDiscounts(data.discounts);
+        console.log("product.discounts :>> ", data);
         setTemporaryImages(data.images || []);
       })
       .catch((error) => {
@@ -72,21 +77,30 @@ export default function UpdateProduct() {
   };
 
   useEffect(() => {
-    axios.get("api/category?type=all").then((response) => {
-      setCategories(response.data.data);
-      axios
-        .get("/api/tag?type=all")
-        .then((response) => {
-          const tagsFromResponse = response.data.data.map((tag) => ({
-            value: tag.id,
-            label: tag.name,
-          }));
-          setSuggestions(tagsFromResponse);
-        })
-        .then(() => {
-          fetchProduct();
-        });
-    });
+    const fetchData = async () => {
+      try {
+        const [categoriesResponse, tagsResponse] = await Promise.all([
+          axios.get("api/category?type=all"),
+          axios.get("/api/tag?type=all"),
+        ]);
+
+        setCategories(categoriesResponse.data.data);
+
+        const tagsFromResponse = tagsResponse.data.data.map((tag) => ({
+          value: tag.id,
+          label: tag.name,
+        }));
+
+        setSuggestions(tagsFromResponse);
+        await fetchProduct();
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
   }, [id, auth.permissions]);
 
   const handleRemoveImage = (image) => {
@@ -353,7 +367,9 @@ export default function UpdateProduct() {
               <option selected>Choose a country</option>
               {categories &&
                 categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
                 ))}
             </select>
           </div>
@@ -370,19 +386,20 @@ export default function UpdateProduct() {
             className="flex gap-2 flex-wrap w-full"
             style={{ gridColumnStart: "1", gridColumnEnd: "3" }}
           >
-            {temporaryImages && temporaryImages.map((image) => (
-              <div key={image.id ?? image.url} className="image-container">
-                <img className="w-14 h-14" src={image.url} alt="display" />
-                <button
-                  type="button"
-                  disabled={processing}
-                  onClick={() => handleRemoveImage(image)}
-                  className="bg-red-600 text-white px-1 mt-1 rounded disabled:bg-red-300 disabled:cursor-not-allowed"
-                >
-                  x
-                </button>
-              </div>
-            ))}
+            {temporaryImages &&
+              temporaryImages.map((image) => (
+                <div key={image.id ?? image.url} className="image-container">
+                  <img className="w-14 h-14" src={image.url} alt="display" />
+                  <button
+                    type="button"
+                    disabled={processing}
+                    onClick={() => handleRemoveImage(image)}
+                    className="bg-red-600 text-white px-1 mt-1 rounded disabled:bg-red-300 disabled:cursor-not-allowed"
+                  >
+                    x
+                  </button>
+                </div>
+              ))}
           </div>
           {progress !== 0 && (
             <div
@@ -393,6 +410,26 @@ export default function UpdateProduct() {
                 className="bg-indigo-600 h-2.5 rounded-full"
                 style={{ width: `${progress}%` }}
               ></div>
+            </div>
+          )}
+          {!discounts.length > 0 ? (
+            <div>
+              <h2>no discounts</h2>
+              <button>add new</button>
+            </div>
+          ) : (
+            <div style={{ gridColumnStart: "1", gridColumnEnd: "3" }}>
+              <h2>Discounts:</h2>
+              <div className="grid grid-cols-2 w-full gap-2">
+                {discounts.map((discount) => (
+                  <Discount
+                    key={discount.id}
+                    discount={discount}
+                    onDelete={(id) => alert(id)}
+                    onUpdate={(id) => alert(id)}
+                  />
+                ))}
+              </div>
             </div>
           )}
           <button

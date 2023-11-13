@@ -66,11 +66,11 @@ const Tags = () => {
     if (sort != null) {
       params.set("sort", sort);
       navigate(`?${params.toString()}`);
+      fetchTags();
     } else {
       params.delete("sort");
       navigate(`?${params.toString()}`);
     }
-    fetchTags();
   }, [sort]);
 
   const navigate = useNavigate();
