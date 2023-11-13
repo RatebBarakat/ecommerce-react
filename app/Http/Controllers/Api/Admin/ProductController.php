@@ -90,7 +90,7 @@ class ProductController extends Controller
         $sort = in_array(request('sort'), $validColumns) ? request('sort') : 'id';
 
         return ProductResource::collection(
-            Product::orderBy($sort, $sort == 'id' ? 'desc' : 'asc')->paginate(10)
+            Product::with('tags','media','category')->orderBy($sort, $sort == 'id' ? 'desc' : 'asc')->paginate(10)
         );
     }
 
@@ -118,7 +118,7 @@ class ProductController extends Controller
 
     public function show(int $id)
     {
-        $Product = Product::findOrFail($id);
+        $Product = Product::with('media','tags:id,name','category:id,name','discounts')->findOrFail($id);
         return ProductResource::make($Product);
     }
 
@@ -149,7 +149,7 @@ class ProductController extends Controller
 
     public function destroy(Request $request, Product $Product)
     {
-        abort_if(Gate::denies('delete-products'), 403);
+        $this->authorize('delete-products');
         $Product->delete();
         return $this->successResponse(message: 'Product deleted successfully');
     }

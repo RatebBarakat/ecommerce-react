@@ -35,4 +35,8 @@ class Product extends Model implements HasMedia
             $media->delete();
         }
     }
+
+    public function discounts() {
+        return $this->hasMany(Discount::class);
+    }
 }

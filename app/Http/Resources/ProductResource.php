@@ -15,9 +15,6 @@ class ProductResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $this->load("media");
-        $this->load("tags");
-
         $images = [];
         $media = $this->getMedia('images');
 
@@ -28,24 +25,29 @@ class ProductResource extends JsonResource
             ];
         }
 
-        $category = $this->category;
 
         return [
             'id' => $this->id,
             'name' => $this->name,
             'slug' => $this->slug,
             'small_description' => $this->small_description,
-            (!$request->routeIs('product.index')) ?? 'description' => $this->description ,
+            (!$request->routeIs('product.index')) ?? 'description' => $this->description,
             'price' => $this->price,
             'quantity' => $this->quantity,
             'images' => $images ? ($request->routeIs('product.index') ?
                 $images[0] : $images) : null,
-            'category' => [
-                'id' => $category->id,
-                'name' => $category->name
-            ],
-            'tags' => $request->routeIs('product.index') ? implode(',', $this->tags->pluck('name')->toArray())
-                : TagResource::collection($this->tags),
+            'category' => $this->whenLoaded('category', function () {
+                return [
+                    'id' => $this->category->id,
+                    'name' => $this->category->name
+                ];
+            }),
+            'tags' => $this->whenLoaded('tags', function () use ($request) {
+                return $request->routeIs('product.index') ? implode(',', $this->tags->pluck('name')->toArray()) : TagResource::collection($this->tags);
+            }),
+            'discounts' => $this->whenLoaded('discounts', function () use ($request) {
+                return DiscountResource::collection($this->discounts);
+            }),
         ];
     }
 }
