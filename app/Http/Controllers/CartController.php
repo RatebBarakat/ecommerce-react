@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\CartResource;
 use App\Http\Traits\ApiResponse;
+use App\Models\Cart;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -13,20 +14,21 @@ class CartController extends Controller
     {
         $total = 0;
         foreach ($carts as $cart) {
-            $total = $cart->product->quantity * $cart->quantity;
+            $total += $cart->product->price * $cart->quantity;
         }
         return $total;
     }
     public function index()
     {
         $user = auth()->user();
-        $user->load("carts", "carts.product");
-        $carts = $user->carts;
-
-        return CartResource::collection(auth()->user()->carts)->additional([
+    
+        $carts = $user->carts()->with('product','product.media')->get();
+    
+        return CartResource::collection($carts)->additional([
             "total" => $this->getTotal($carts),
         ]);
     }
+    
 
     public function store(Request $request)
     {
@@ -40,6 +42,20 @@ class CartController extends Controller
             $request->only('quantity')
         );
 
-        return $this->successResponse( message : "cart updated");
+        return $this->successResponse(message: "cart updated");
+    }
+
+    public function update(Request $request, Cart $cart)
+    {
+        $this->authorize("update", $cart);
+        $cart->update($request->only("quantity"));
+        return $this->successResponse(message: "cart updated successfully");
+    }
+
+    public function destroy(Request $request, Cart $cart)
+    {
+        $user = auth()->user();
+        $cart->delete();
+        return $this->successResponse(message: "cart item deleted successfully");
     }
 }
