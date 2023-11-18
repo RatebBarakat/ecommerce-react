@@ -43,7 +43,7 @@ class User extends Authenticatable implements MustVerifyEmail,CanResetPassword
 
     public function hasPermission($slug)
     {
-        return $this->role && $this->role->permissions->contains('slug', $slug);
+        return $this->role && $this->role()->permissions()->contains('slug', $slug);
     }
 
     public function profile() {
