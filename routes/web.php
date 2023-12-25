@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Resources\ProductResource;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\Varient;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Route;
 
@@ -15,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-      echo cache('categories');
+    echo config('settings.is_option_static');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

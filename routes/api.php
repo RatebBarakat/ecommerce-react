@@ -4,8 +4,10 @@ use App\Http\Controllers\Api\Admin\CategoryController;
 use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\ProductController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController as UserCategoryController;
+use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\TagController;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\Role;
@@ -58,6 +60,12 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     ]);
     Route::apiResource('product', ProductController::class, [
         'name' => 'product.'
+    ]);
+    Route::apiResource('discount', DiscountController::class, [
+        'name' => 'discount.'
+    ]);
+    Route::apiResource('attribute', AttributeController::class, [
+        'name' => 'attribute.'
     ]);
     Route::apiResource('tag', TagController::class, [
         'name' => 'tag.'
