@@ -1,5 +1,7 @@
+import React from "react";
+
 // eslint-disable-next-line react/prop-types
-export const Input = ({error, style,label, type, value, onChange, placeholder,multiple }) => {
+const Input = ({error,name, style,label, type, value, onChange, placeholder,multiple }) => {
   return (
     <>
       <div style={style}>
@@ -12,6 +14,7 @@ export const Input = ({error, style,label, type, value, onChange, placeholder,mu
       <input
         id={label}
         type={type}
+        name={name}
         multiple={multiple}
         value={value}
         className="bg-gray-50 focus:outline-none border-2
@@ -24,3 +27,5 @@ export const Input = ({error, style,label, type, value, onChange, placeholder,mu
     </>
   );
 };
+
+export default React.memo(Input);

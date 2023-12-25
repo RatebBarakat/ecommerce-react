@@ -9,6 +9,11 @@ import "../public/css/table.css";
 import { ProfileProvider } from "./contexts/profile";
 import "react-toastify/dist/ReactToastify.css";
 import { CartProvider } from "./contexts/cart";
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+
+library.add(faEdit, faTrash)
 
 const root = createRoot(document.getElementById("root"));
 

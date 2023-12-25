@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Input } from "../../components/input";
+import Input from "../../components/input";
 import Toast from "../../components/Toast";
 import ErrorHelper from "../../helpers/errors";
 import Loading from "../../components/Loading";

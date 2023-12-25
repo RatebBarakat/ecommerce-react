@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   TERipple,
   TEModal,
@@ -80,4 +80,4 @@ const Modal = ({ header, errors, identifier, showModal, toggleModal, onSubmit, c
   );
 };
 
-export default Modal;
+export default React.memo(Modal);
