@@ -17,6 +17,14 @@ class Product extends Model implements HasMedia
         return $this->belongsTo(Category::class);
     }
 
+    public function varients() {
+        return $this->hasMany(Varient::class);
+    }
+
+    public function attributes() {
+        return $this->belongsToMany(Attribute::class,'product_attribute');
+    }
+
     public function tags()
     {
         return $this->belongsToMany(Tag::class, 'tag_taggable', 'product_id', 'tag_id');

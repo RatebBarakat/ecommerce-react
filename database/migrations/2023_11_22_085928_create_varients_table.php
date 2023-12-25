@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tags', function (Blueprint $table) {
+        Schema::create('varients', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->index();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+            $table->double('price');
+            $table->integer('quantity');
             $table->timestamps();
         });
     }
@@ -23,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tags');
+        Schema::dropIfExists('varients');
     }
 };

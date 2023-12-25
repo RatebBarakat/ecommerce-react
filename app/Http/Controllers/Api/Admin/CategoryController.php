@@ -37,14 +37,18 @@ class CategoryController extends Controller
         $validColumns = DB::getSchemaBuilder()->getColumnListing('categories');
 
         $sort = in_array(request('sort'), $validColumns) ? request('sort') : 'id';
-
+        $search = request('search');
         return CategoryResource::collection(
             request()->get('type') === "all" ?
                 Cache::remember('categories', Carbon::now()->addDay(), function () use($sort) {
                     return Category::orderBy('id', 'desc')
                     ->get(['id', 'name']);
                 })
-                : Category::orderBy($sort, $sort == 'id' ? 'desc' : 'asc')->paginate(10)
+                : Category::orderBy($sort, $sort == 'id' ? 'desc' : 'asc')
+                    ->when(!empty($search),function ($query) use ($search) {
+                        $query->where('name','LIKE',"%$search%");
+                    })
+                    ->paginate(10)
         );
     }
 
