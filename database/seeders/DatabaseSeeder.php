@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
         $this->call(CategorySeeder::class);
         $this->call(TagSeeder::class);
         $this->call(ProductSeeder::class);
+        $this->call(SettingSeeder::class);
         
         \App\Models\User::create([
             'name' => 'rateb',
