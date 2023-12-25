@@ -30,7 +30,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->registerPolicies();
+        // $this->registerPolicies();
 
         $permissions = Cache::remember('permissions', 60 * 60, function () {
             return Permission::get('slug');
