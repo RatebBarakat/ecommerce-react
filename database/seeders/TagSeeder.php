@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Tag;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Faker\Factory as Faker;
 
 class TagSeeder extends Seeder
 {
@@ -13,9 +14,11 @@ class TagSeeder extends Seeder
      */
     public function run(): void
     {
-        for ($i = 0; $i < 1000; $i++) {
+        $faker = Faker::create();
+
+        for ($i = 0; $i < 100; $i++) {
             Tag::create([
-                "name" => "test" . $i,
+                "name" => $faker->name(),
             ]);
         }
     }
