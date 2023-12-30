@@ -471,7 +471,8 @@ export default function CreateProduct() {
                                                     </button>
                                                 </div>
                                                 {attribute.options &&
-                                                    attribute.options.map(
+                                                    <div className="flex gap-2">
+                                                        {attribute.options.map(
                                                         (
                                                             option,
                                                             optionIndex
@@ -486,6 +487,8 @@ export default function CreateProduct() {
                                                             </div>
                                                         )
                                                     )}
+                                                    </div>
+                                                }
                                             </div>
                                         </div>
                                     ))}

@@ -645,17 +645,25 @@ export default function UpdateProduct() {
                                                     Add Option
                                                 </button>
                                             </div>
-                                            {attribute.options &&
-                                                attribute.options.map(
-                                                    (option, optionIndex) => (
-                                                        <div
-                                                            className="border border-blue-500 rounded p-2 text-blue-500 w-fit"
-                                                            key={optionIndex}
-                                                        >
-                                                            {option}
-                                                        </div>
-                                                    )
-                                                )}
+                                            {attribute.options && (
+                                                <div className="flex gap-2">
+                                                    {attribute.options.map(
+                                                        (
+                                                            option,
+                                                            optionIndex
+                                                        ) => (
+                                                            <div
+                                                                className="border border-blue-500 rounded p-2 text-blue-500 w-fit"
+                                                                key={
+                                                                    optionIndex
+                                                                }
+                                                            >
+                                                                {option}
+                                                            </div>
+                                                        )
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 ))}
