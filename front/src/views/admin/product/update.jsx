@@ -36,7 +36,7 @@ export default function UpdateProduct() {
             ...updatedVariants[index],
             [fieldName]: value,
         };
-        setVariants(updatedVariants);
+        setVarients(updatedVariants);
     };
     const handleAddOption = (index, option) => {
         const updatedAttributes = [...attributes];

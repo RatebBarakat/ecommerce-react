@@ -198,7 +198,7 @@ class ProductController extends Controller
         try {
             $validatedData = $updateProductRequest->validated();
 
-            unset($validatedData['images'], $validatedData['tags']);
+            unset($validatedData['images'], $validatedData['tags'], $validatedData['attributes']);
 
             $product->update($validatedData);
 
