@@ -14,6 +14,7 @@ use App\Models\Varient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -92,23 +93,33 @@ class ProductController extends Controller
 
         $validColumns = DB::getSchemaBuilder()->getColumnListing('products');
 
-        $sort = in_array(request('sort'), $validColumns) ? request('sort') : 'id';
+        $sort = in_array(request('sort'), $validColumns) ? request('sort') : 'products.id';
         $search = request('search');
-        $products = Product::with([
-            'media',
-            'tags',
-            'category'
-        ])->when(!empty($search), function ($query) use ($search) {
-            $query->where(function ($query) use ($search) {
-                $query->where('name', 'LIKE', "%$search%")
-                    ->orWhere('description', 'LIKE', "%$search%")
-                    ->orWhere('small_description', 'LIKE', "%$search%");
-            });
-        })->when(!empty($search), function ($query) use ($search) {
-            $query->OrwhereHas('category', function ($query) use ($search) {
-                $query->where('name', 'LIKE', "%$search%");
-            });
-        })->orderBy($sort, $sort == 'desc' ? 'desc' : 'asc')
+
+        $products = Product::with(['media', 'tags', 'category'])
+            ->when(!empty($search), function ($query) use ($search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('name', 'LIKE', "%$search%")
+                        ->orWhere('description', 'LIKE', "%$search%")
+                        ->orWhere('small_description', 'LIKE', "%$search%");
+                });
+            })
+            ->when(!empty(request('hasVarients')), function ($query) {
+                request('hasVarients') == 'yes' ?
+                    $query->join(
+                        DB::raw('(SELECT DISTINCT product_id FROM product_attribute) as pa'),
+                        'pa.product_id',
+                        '=',
+                        'products.id'
+                    ) : $query->leftJoin(
+                        DB::raw('(SELECT DISTINCT product_id FROM product_attribute) as pa'),
+                        'pa.product_id',
+                        '=',
+                        'products.id'
+                    )->whereRaw('pa.product_id IS NULL');
+            })
+            ->orderBy($sort, $sort == 'desc' ? 'desc' : 'asc')
+            ->distinct()
             ->paginate(10);
 
 
@@ -155,6 +166,7 @@ class ProductController extends Controller
         $product->attributes()->sync(array_values($createdAttributes));
 
         foreach ($variants as $variantData) {
+            Log::info($variantData);
             $variant = Varient::create([
                 'price' => $variantData['price'],
                 'quantity' => $variantData['quantity'],

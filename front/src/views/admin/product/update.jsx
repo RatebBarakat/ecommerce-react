@@ -30,6 +30,25 @@ export default function UpdateProduct() {
     //   start_date : formatDate(Date.now()),
     //   end_date : formatDate(Date.now() + + 7 * 24 * 60 * 60 * 1000),
     // });
+    const handleVariantChange = (index, fieldName, value) => {
+        const updatedVariants = [...varients];
+        updatedVariants[index] = {
+            ...updatedVariants[index],
+            [fieldName]: value,
+        };
+        setVariants(updatedVariants);
+    };
+    const handleAddOption = (index, option) => {
+        const updatedAttributes = [...attributes];
+        updatedAttributes[index].options.push(option);
+        setAttributes(updatedAttributes);
+    };
+
+    const handleAddAttribute = (name) => {
+        setAttributes([...attributes, { name: name, options: [] }]);
+        attri.current.value = "";
+        attri.current.focus();
+    };
 
     const addDiscount = () => {
         axios
@@ -96,9 +115,6 @@ export default function UpdateProduct() {
                 });
                 setAttributes(Array.from(data.attributes));
                 setVarients(Array.from(data.varients));
-                console.log([
-                    ...data.varients
-                ])
                 setTemporaryImages(data.images || []);
             })
             .catch((error) => {
@@ -110,6 +126,62 @@ export default function UpdateProduct() {
             .finally(() => {
                 setIsLoading(false);
             });
+    };
+
+    useEffect(() => {
+        setVarients([]);
+        const generateVariants = () => {
+            if (attributes.length > 0) {
+                const combinations = getAllCombinations(attributes);
+                console.log(combinations);
+                const newVariants = combinations.map((combination) => {
+                    const variant = {
+                        price: 0,
+                        quantity: 0,
+                        options: combination.map((attr) => ({
+                            name: attr.name,
+                            value: attr.value,
+                        })),
+                    };
+                    return variant;
+                });
+                setVarients(newVariants);
+            } else {
+                setVarients([]);
+            }
+        };
+
+        generateVariants();
+    }, [attributes]);
+
+    const getAllCombinations = (attributes) => {
+        const result = [[]];
+
+        const generateCombinations = (index, combination) => {
+            if (index === attributes.length) {
+                result.push(combination);
+                return;
+            }
+
+            const { name, options } = attributes[index];
+
+            options.forEach((option) => {
+                const newCombination = [
+                    ...combination,
+                    { name: name, value: option },
+                ];
+                generateCombinations(index + 1, newCombination);
+            });
+        };
+
+        generateCombinations(0, []);
+
+        const uniqueCombinations = result.slice(1).filter((combination) => {
+            const uniqueNames = new Set(combination.map((attr) => attr.name));
+            return uniqueNames.size === combination.length;
+        });
+
+        return uniqueCombinations;
     };
 
     useEffect(() => {
@@ -502,7 +574,7 @@ export default function UpdateProduct() {
                             </button>
                         </div>
                         <div
-                            className="flex gap-2"
+                            className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full"
                             style={{
                                 gridColumnStart: "1",
                                 gridColumnEnd: "3",
@@ -514,70 +586,86 @@ export default function UpdateProduct() {
                                         <div className="border border-indigo-500 rounded p-2 text-indigo-500">
                                             {attribute.name}
                                         </div>
-                                        <div className="flex gap-2 m-2">
+                                        <div className="">
+                                            <div className="flex gap-2 my-2 justify-center">
+                                                <input
+                                                    type="text"
+                                                    value={optionsInput}
+                                                    onChange={(e) =>
+                                                        setOptionsInput(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    placeholder="Enter option"
+                                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        handleAddOption(
+                                                            index,
+                                                            optionsInput
+                                                        );
+                                                        setOptionsInput("");
+                                                    }}
+                                                    className="group whitespace-nowrap disabled:cursor-not-allowed disabled:!bg-indigo-400 relative py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white !bg-indigo-600 hover:!bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                >
+                                                    Add Option
+                                                </button>
+                                            </div>
                                             {attribute.options &&
                                                 attribute.options.map(
                                                     (option, optionIndex) => (
                                                         <div
-                                                            className="border border-blue-500 rounded p-2 text-blue-500"
+                                                            className="border border-blue-500 rounded p-2 text-blue-500 w-fit"
                                                             key={optionIndex}
                                                         >
                                                             {option}
                                                         </div>
                                                     )
                                                 )}
-                                            <input
-                                                type="text"
-                                                value={optionsInput}
-                                                onChange={(e) =>
-                                                    setOptionsInput(
-                                                        e.target.value
-                                                    )
-                                                }
-                                                placeholder="Enter option"
-                                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                            />
                                         </div>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                handleAddOption(
-                                                    index,
-                                                    optionsInput
-                                                );
-                                                setOptionsInput("");
-                                            }}
-                                            clasfsName="group disabled:cursor-not-allowed disabled:!bg-indigo-400 relative py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white !bg-indigo-600 hover:!bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                        >
-                                            Add Option
-                                        </button>
                                     </div>
                                 ))}
+                            {varients && (
+                                <>
+                                    <div className="flex flex-wrap gap-2 w-full">
+                                        {varients.map((item, index) => (
+                                            <div className="shadow p-2 ">
+                                                <Input
+                                                    label="price"
+                                                    onChange={(e) =>
+                                                        handleVariantChange(
+                                                            index,
+                                                            "price",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    value={item.price}
+                                                />
+                                                <Input
+                                                    label="quantity"
+                                                    onChange={(e) =>
+                                                        handleVariantChange(
+                                                            index,
+                                                            "quantity",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    value={item.quantity}
+                                                />
+                                                {item.options.map((option) => (
+                                                    <p>
+                                                        {option.name} :{" "}
+                                                        {option.value}
+                                                    </p>
+                                                ))}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
                         </div>
-                        {varients && (
-                            <>
-                                <div className="flex flex-wrap gap-2 w-full">
-                                    {varients.map((item, index) => (
-                                        <div className="shadow p-2 ">
-                                            <Input
-                                                label="price"
-                                                value={item.price}
-                                            />
-                                            <Input
-                                                label="quantity"
-                                                value={item.quantity}
-                                            />
-                                            {item.options.map((option) => (
-                                                <p>
-                                                    {option.name} :{" "}
-                                                    {option.value}
-                                                </p>
-                                            ))}
-                                        </div>
-                                    ))}
-                                </div>
-                            </>
-                        )}
                     </div>
                     {progress !== 0 && (
                         <div

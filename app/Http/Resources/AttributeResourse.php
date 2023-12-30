@@ -17,7 +17,7 @@ class AttributeResourse extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'options' => $this->options->pluck('value'),
+            'options' => array_unique($this->options->pluck('value')->toArray()),
         ];
     }
 }

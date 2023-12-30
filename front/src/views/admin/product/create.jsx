@@ -44,7 +44,7 @@ export default function CreateProduct() {
         attri.current.value = "";
         attri.current.focus();
     };
-    
+
     useEffect(() => {
         axios
             .get("api/category?type=all")
@@ -92,6 +92,15 @@ export default function CreateProduct() {
 
         generateVariants();
     }, [attributes]);
+
+    const handleVariantChange = (index, fieldName, value) => {
+        const updatedVariants = [...varients];
+        updatedVariants[index] = {
+            ...updatedVariants[index],
+            [fieldName]: value,
+        };
+        setVarients(updatedVariants);
+    };
 
     const getAllCombinations = (attributes) => {
         const result = [[]];
@@ -423,7 +432,7 @@ export default function CreateProduct() {
                                 </button>
                             </div>
                             <div
-                                className="flex gap-2"
+                                className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full"
                                 style={{
                                     gridColumnStart: "1",
                                     gridColumnEnd: "3",
@@ -435,7 +444,33 @@ export default function CreateProduct() {
                                             <div className="border border-indigo-500 rounded p-2 text-indigo-500">
                                                 {attribute.name}
                                             </div>
-                                            <div className="flex gap-2 m-2">
+                                            <div className="">
+                                                <div className="flex gap-2 my-2 justify-center">
+                                                    <input
+                                                        type="text"
+                                                        value={optionsInput}
+                                                        onChange={(e) =>
+                                                            setOptionsInput(
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        placeholder="Enter option"
+                                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            handleAddOption(
+                                                                index,
+                                                                optionsInput
+                                                            );
+                                                            setOptionsInput("");
+                                                        }}
+                                                        className="group whitespace-nowrap disabled:cursor-not-allowed disabled:!bg-indigo-400 relative py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white !bg-indigo-600 hover:!bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                    >
+                                                        Add Option
+                                                    </button>
+                                                </div>
                                                 {attribute.options &&
                                                     attribute.options.map(
                                                         (
@@ -443,7 +478,7 @@ export default function CreateProduct() {
                                                             optionIndex
                                                         ) => (
                                                             <div
-                                                                className="border border-blue-500 rounded p-2 text-blue-500"
+                                                                className="border border-blue-500 rounded p-2 text-blue-500 w-fit"
                                                                 key={
                                                                     optionIndex
                                                                 }
@@ -452,30 +487,6 @@ export default function CreateProduct() {
                                                             </div>
                                                         )
                                                     )}
-                                                <input
-                                                    type="text"
-                                                    value={optionsInput}
-                                                    onChange={(e) =>
-                                                        setOptionsInput(
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    placeholder="Enter option"
-                                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        handleAddOption(
-                                                            index,
-                                                            optionsInput
-                                                        );
-                                                        setOptionsInput("");
-                                                    }}
-                                                    className="group disabled:cursor-not-allowed disabled:!bg-indigo-400 relative py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white !bg-indigo-600 hover:!bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                                >
-                                                    Add Option
-                                                </button>
                                             </div>
                                         </div>
                                     ))}
@@ -487,10 +498,24 @@ export default function CreateProduct() {
                                             <div className="shadow p-2 ">
                                                 <Input
                                                     label="price"
+                                                    onChange={(e) =>
+                                                        handleVariantChange(
+                                                            index,
+                                                            "price",
+                                                            e.target.value
+                                                        )
+                                                    }
                                                     value={item.price}
                                                 />
                                                 <Input
                                                     label="quantity"
+                                                    onChange={(e) =>
+                                                        handleVariantChange(
+                                                            index,
+                                                            "quantity",
+                                                            e.target.value
+                                                        )
+                                                    }
                                                     value={item.quantity}
                                                 />
                                                 {item.options.map((option) => (

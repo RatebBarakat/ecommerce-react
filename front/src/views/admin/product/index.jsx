@@ -7,7 +7,7 @@ import "tw-elements-react/dist/css/tw-elements-react.min.css";
 import Table from "../../../components/Table";
 import createAxiosInstance from "../../../axios";
 import { Permission } from "../../../helpers/permissions";
-import debounce from 'lodash/debounce';
+import debounce from "lodash/debounce";
 
 const Products = () => {
     const getInitialPage = () => {
@@ -21,6 +21,7 @@ const Products = () => {
     const [selected, setSelected] = useState([]);
     const [sort, setSort] = useState(null);
     const [search, setSearch] = useState(null);
+    const [hasVarients, setHasVarients] = useState(null);
     const [links, setLinks] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [numberofPages, setNumberOfPages] = useState(0);
@@ -56,6 +57,22 @@ const Products = () => {
             console.log("search changed finish", search);
         };
     }, [search]);
+
+    useEffect(() => {
+        let params = new URLSearchParams(location.search);
+        if (hasVarients != null) {
+            params.set("hasVarients", hasVarients);
+            navigate(`?${params.toString()}`);
+        } else {
+            params.delete("hasVarients");
+            navigate(`?${params.toString()}`);
+        }
+        fetchProducts(page, sort);
+
+        return () => {
+            console.log("hasVarient changed finish", hasVarients);
+        };
+    }, [hasVarients]);
 
     useEffect(() => {
         let params = new URLSearchParams(location.search);
@@ -178,9 +195,13 @@ const Products = () => {
             param.set("sort", sort);
         }
 
+        if (hasVarients !== null) {
+            param.set("hasVarients", hasVarients);
+        }
+
         if (search !== null) {
-          param.set("search", search);
-      }
+            param.set("search", search);
+        }
 
         paginateUrl += `?${param.toString()}`;
         axios
@@ -261,16 +282,27 @@ const Products = () => {
                         </button>
                     )}
                 </div>
-                <input
-                    type="search"
-                    name="search-product"
-                    onChange={(event) => setSearch(event.target.value)}
-                    class="bg-gray-50 border border-gray-300 my-3 text-gray-900 text-sm rounded-lg focus:ring-blue-500
+                <div className="flex gap-1 items-center">
+                    <input
+                        type="search"
+                        name="search-product"
+                        onChange={(event) => setSearch(event.target.value)}
+                        className="bg-gray-50 border border-gray-300 my-3 text-gray-900 text-sm rounded-lg focus:ring-blue-500
                      focus:border-blue-500 block w-1/4 ml-3 p-2.5 dark:bg-gray-700 dark:border-gray-600
                       dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500
                        dark:focus:border-blue-500"
                         placeholder="search..."
-                />
+                    />
+                    <select
+                        id="countries"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 w-1/4 h-fit text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        onChange={(event) => setHasVarients(event.target.value)}
+                    >
+                        <option value="">has varients</option>
+                        <option value="yes">yes</option>
+                        <option value="no">no</option>
+                    </select>
+                </div>
                 <Table
                     columns={columns}
                     data={products}

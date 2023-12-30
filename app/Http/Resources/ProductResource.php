@@ -50,17 +50,19 @@ class ProductResource extends JsonResource
                 return AttributeResourse::collection($this->attributes);
             }),
             'varients' => $this->whenLoaded('varients', function () {
-                return [$this->formatVarients($this->varients)];
+                return $this->formatVarients($this->varients);
             }),
         ];
     }
 
     private function formatVarients($varients)
     {
-        foreach ($varients as $varient) {
+        $formattedVariants = [];
+    
+        foreach ($varients as $variant) {
             $options = [];
-
-            foreach ($varient->attributes as $attribute) {
+    
+            foreach ($variant->attributes as $attribute) {
                 $attributeValue = $attribute->pivot->value;
                 $attributeName = $this->attributes->filter(function ($attribute) {
                     return $attribute->where('attribute_id', $attribute->attribute_id);
@@ -71,12 +73,15 @@ class ProductResource extends JsonResource
                     'value' => $attributeValue
                 ];
             }
-
-            return [
-                'price' => $varient->price,
-                'quantity' => $varient->quantity,
+    
+            $formattedVariants[] = [
+                'id' => $variant->id,
+                'price' => $variant->price,
+                'quantity' => $variant->quantity,
                 'options' => $options
             ];
         }
+    
+        return $formattedVariants;
     }
 }
