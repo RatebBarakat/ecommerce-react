@@ -159,7 +159,6 @@ export default function CreateProduct() {
             attributes.forEach((attribute) => {
                 formData.append("attributes[]", attribute.name);
             });
-
             varients.forEach((varient, index) => {
                 formData.append(`varients[${index}][price]`, varient.price);
                 formData.append(

@@ -133,11 +133,19 @@ export default function UpdateProduct() {
         const generateVariants = () => {
             if (attributes.length > 0) {
                 const combinations = getAllCombinations(attributes);
-                console.log(combinations);
                 const newVariants = combinations.map((combination) => {
+                    const existingVariant = varients.find((v) =>
+                        v.options.every(
+                            (opt, index) =>
+                                opt.value === combination[index].value
+                        )
+                    );
+
                     const variant = {
-                        price: 0,
-                        quantity: 0,
+                        price: existingVariant ? existingVariant.price : 0,
+                        quantity: existingVariant
+                            ? existingVariant.quantity
+                            : 0,
                         options: combination.map((attr) => ({
                             name: attr.name,
                             value: attr.value,
@@ -336,6 +344,30 @@ export default function UpdateProduct() {
         if (product.tags) {
             Array.from(product.tags).map((tag) => {
                 formData.append("tags[]", tag.value);
+            });
+        }
+
+        if (attributes.length > 0) {
+            attributes.forEach((attribute) => {
+                formData.append("attributes[]", attribute.name);
+            });
+            varients.forEach((varient, index) => {
+                formData.append(`varients[${index}][price]`, varient.price);
+                formData.append(
+                    `varients[${index}][quantity]`,
+                    varient.quantity
+                );
+
+                varient.options.forEach((option, optionIndex) => {
+                    formData.append(
+                        `varients[${index}][options][${optionIndex}][name]`,
+                        option.name
+                    );
+                    formData.append(
+                        `varients[${index}][options][${optionIndex}][value]`,
+                        option.value
+                    );
+                });
             });
         }
 
