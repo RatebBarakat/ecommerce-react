@@ -41,7 +41,7 @@ class ProductResource extends JsonResource
                 ];
             }),
             'tags' => $this->whenLoaded('tags', function () use ($request) {
-                return $request->routeIs('product.index') ? implode(',', $this->tags->pluck('name')->toArray()) : TagResource::collection($this->tags);
+                return strpos($request->route()->getName(),'index') !== -1 ? implode(',', $this->tags->pluck('name')->toArray()) : TagResource::collection($this->tags);
             }),
             'discounts' => $this->whenLoaded('discounts', function () {
                 return DiscountResource::collection($this->discounts);
