@@ -157,7 +157,7 @@ class ProductController extends Controller
         $createdVariants = [];
 
         foreach ($attributes as $attributeData) {
-            $attribute = Attribute::updateOrCreate([
+            $attribute = Attribute::create([
                 'name' => $attributeData,
             ]);
             $createdAttributes[$attribute->name] = $attribute->id;
