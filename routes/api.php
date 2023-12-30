@@ -9,6 +9,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController as UserCategoryController;
 use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\TagController;
+use App\Http\Controllers\User\ProductController as UserProductController;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\Role;
 use App\Models\User;
@@ -45,6 +46,7 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 
 Route::prefix('user')->group(function () {
     Route::get('/category',[UserCategoryController::class,'index'])->name('user.category.index');
+    Route::get('/product',[UserProductController::class,'index'])->name('user.product.index');
 });
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
