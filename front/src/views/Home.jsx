@@ -15,7 +15,7 @@ export default function Home() {
   const cart = useContext(CartContext);
 
   useEffect(() => {
-    axios.get("/api/product").then((response) => {
+    axios.get("/api/user/product").then((response) => {
       setProducts(response.data.data);
       setIsLoading(false);
     });
