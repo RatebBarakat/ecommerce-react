@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('country');
             $table->string('address');
+            $table->string('type');
+            $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
             $table->timestamps();
         });
     }
