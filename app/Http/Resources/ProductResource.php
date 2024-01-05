@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Helpers\CurencyHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -31,7 +32,7 @@ class ProductResource extends JsonResource
             'slug' => $this->slug,
             'small_description' => $this->small_description,
             'description' => $request->routeIs('product.index') ? null : $this->description,
-            'price' => $this->price,
+            'price' => CurencyHelper::format($this->price),
             'quantity' => $this->quantity,
             'images' => $images ? ($request->routeIs('product.index') ? $images[0] : $images) : null,
             'category' => $this->whenLoaded('category', function () {
@@ -41,8 +42,11 @@ class ProductResource extends JsonResource
                 ];
             }),
             'tags' => $this->whenLoaded('tags', function () use ($request) {
-                return strpos($request->route()->getName(),'index') !== -1 ? implode(',', $this->tags->pluck('name')->toArray()) : TagResource::collection($this->tags);
+                return strpos($request->route()->getName(), 'index') !== false
+                    ? implode(',', $this->tags->pluck('name')->toArray())
+                    : TagResource::collection($this->tags);
             }),
+
             'discounts' => $this->whenLoaded('discounts', function () {
                 return DiscountResource::collection($this->discounts);
             }),
@@ -58,10 +62,10 @@ class ProductResource extends JsonResource
     private function formatVarients($varients)
     {
         $formattedVariants = [];
-    
+
         foreach ($varients as $variant) {
             $options = [];
-    
+
             foreach ($variant->attributes as $attribute) {
                 $attributeValue = $attribute->pivot->value;
                 $attributeName = $this->attributes->filter(function ($attribute) {
@@ -73,15 +77,15 @@ class ProductResource extends JsonResource
                     'value' => $attributeValue
                 ];
             }
-    
+
             $formattedVariants[] = [
                 'id' => $variant->id,
-                'price' => $variant->price,
+                'price' => CurencyHelper::format($variant->price),
                 'quantity' => $variant->quantity,
                 'options' => $options
             ];
         }
-    
+
         return $formattedVariants;
     }
 }
