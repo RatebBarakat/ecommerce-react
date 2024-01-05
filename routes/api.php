@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController as UserCategoryController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\User\ProductController as UserProductController;
@@ -45,12 +46,14 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 });
 
 Route::prefix('user')->group(function () {
-    Route::get('/category',[UserCategoryController::class,'index'])->name('user.category.index');
-    Route::get('/product',[UserProductController::class,'index'])->name('user.product.index');
+    Route::get('/category', [UserCategoryController::class, 'index'])->name('user.category.index');
+    Route::get('/product', [UserProductController::class, 'index'])->name('user.product.index');
 });
 
+Route::post('/user/checkout', [CheckoutController::class, 'index']);
+
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
-    Route::apiResource('/cart',CartController::class);
+    Route::apiResource('/cart', CartController::class);
     Route::get('/counts', [DashboardController::class, 'index']);
     Route::post('category/deleteMany', [CategoryController::class, 'deleteMany']);
     Route::post('product/deleteMany', [ProductController::class, 'deleteMany']);
@@ -60,12 +63,22 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::apiResource('category', CategoryController::class, [
         'name' => 'category.'
     ]);
-    Route::apiResource('product', ProductController::class, [
-        'name' => 'product.'
+    Route::apiResource('product', ProductController::class)->names([
+        'index' => 'product.index',
+        'show' => 'product.show',
+        'store' => 'product.store',
+        'update' => 'product.update',
+        'destroy' => 'product.destroy',
     ]);
-    Route::apiResource('discount', DiscountController::class, [
-        'name' => 'discount.'
+
+    Route::apiResource('discount', DiscountController::class)->names([
+        'index' => 'discount.index',
+        'show' => 'discount.show',
+        'store' => 'discount.store',
+        'update' => 'discount.update',
+        'destroy' => 'discount.destroy',
     ]);
+
     Route::apiResource('attribute', AttributeController::class, [
         'name' => 'attribute.'
     ]);
