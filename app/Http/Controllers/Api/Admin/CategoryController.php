@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateCategoryRequest;
 use App\Http\Resources\CategoryResource;
 use App\Http\Traits\ApiResponse;
 use App\Models\Category;
+use App\Observers\CategoryObserver;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -27,7 +28,7 @@ class CategoryController extends Controller
         ]);
 
         Category::query()->whereIn('id', $request->ids)->delete();
-
+        Cache::forget('categories');
         return $this->successResponse(message: 'categories deleted successfully');
     }
     

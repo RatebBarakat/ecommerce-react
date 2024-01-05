@@ -25,7 +25,7 @@ class TagController extends Controller
         ]);
 
         Tag::query()->whereIn('id', $request->ids)->delete();
-
+        Cache::forget('tags');
         return $this->successResponse(message: 'tags deleted successfully');
     }
     public function index()

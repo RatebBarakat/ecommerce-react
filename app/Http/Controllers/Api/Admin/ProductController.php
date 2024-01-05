@@ -104,6 +104,9 @@ class ProductController extends Controller
                         ->orWhere('small_description', 'LIKE', "%$search%");
                 });
             })
+            ->when(!empty(request('categoryFitler')), function ($query) {
+                $query->where('category_id','=', request('categoryFitler'));
+            })
             ->when(!empty(request('hasVarients')), function ($query) {
                 request('hasVarients') == 'yes' ?
                     $query->join(
@@ -118,7 +121,7 @@ class ProductController extends Controller
                         'products.id'
                     )->whereRaw('pa.product_id IS NULL');
             })
-            ->orderBy($sort, $sort == 'desc' ? 'desc' : 'asc')
+            ->orderBy($sort,request('order'))
             ->distinct()
             ->paginate(10);
 
@@ -186,8 +189,7 @@ class ProductController extends Controller
 
     public function show(int $id)
     {
-        $product = Product::with('media', 'tags:id,name', 'category:id,name', 'discounts')->findOrFail($id);
-        $product->load('attributes', 'attributes.options', 'varients', 'varients.attributes');
+        $product = Product::with('media', 'tags:id,name', 'category:id,name', 'discounts','attributes', 'attributes.options', 'varients', 'varients.attributes')->findOrFail($id);
         return ProductResource::make($product);
     }
 
