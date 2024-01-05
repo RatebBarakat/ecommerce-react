@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useLayoutEffect, useState } from "react";
 import { AuthContext } from "../../../contexts/auth";
 import Modal from "../../../components/Modal";
 import { useNavigate } from "react-router-dom";
@@ -204,6 +204,27 @@ const Tags = () => {
             });
     };
 
+    useLayoutEffect(() => {
+        const highlightSearch = () => {
+            const searchText = search ? search.toLowerCase() : '';
+            document.querySelectorAll("table tbody tr td").forEach((element) => {
+                const cellText = element.textContent.toLowerCase();
+                const index = cellText.indexOf(searchText);
+                if (index !== -1) {
+                    const originalText = element.textContent.substr(index, search.length);
+                    element.innerHTML = element.textContent.replace(
+                        new RegExp(originalText, 'i'),
+                        `<span class="highlight">${originalText}</span>`
+                    );
+                }
+            });
+        };
+    
+        if (tags.length > 0 && search !== null && search !== "") {
+            highlightSearch();
+        }
+    }, [tags, search]);
+
     const handleSelectAll = (event) => {
         const selectedAll = event.target.checked;
         if (selectedAll) {
@@ -300,7 +321,7 @@ const Tags = () => {
                     )}
                 </div>
                 <input
-                    type="text"
+                    type="search"
                     onChange={(event) => setSearch(event.target.value)}
                     id="search"
                     class="bg-gray-50 border border-gray-300 my-3 text-gray-900 text-sm rounded-lg focus:ring-blue-500

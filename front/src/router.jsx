@@ -18,11 +18,16 @@ import Updateproduct from "./views/admin/product/update";
 import Tags from "./views/admin/tag";
 import AdminLayout from "./layouts/AdminLayout";
 import Cart from "./views/cart";
+import ProductDetail from "./views/productDetail";
 
 const router = createBrowserRouter([
     {
         path: '/',
         element: <Home />
+    },
+    {
+        path: 'products/details/:id',
+        element: <ProductDetail />
     },
     {
         path: '/',

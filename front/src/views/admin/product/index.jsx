@@ -1,4 +1,10 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import {
+    useCallback,
+    useContext,
+    useEffect,
+    useLayoutEffect,
+    useState,
+} from "react";
 import { AuthContext } from "../../../contexts/auth";
 import { Link, useNavigate } from "react-router-dom";
 import Toast from "../../../components/Toast";
@@ -8,18 +14,21 @@ import Table from "../../../components/Table";
 import createAxiosInstance from "../../../axios";
 import { Permission } from "../../../helpers/permissions";
 import debounce from "lodash/debounce";
+import Select from "react-select";
 
 const Products = () => {
     const getInitialPage = () => {
         let page = new URLSearchParams(location.search).get("page");
         return page !== null && !isNaN(page) && page > 0 ? parseInt(page) : 1;
     };
-
+    const [categoryFitler, setCategoryFitler] = useState(null);
+    const [categories, setCategories] = useState([]);
     const auth = useContext(AuthContext);
     const axios = createAxiosInstance(auth);
     const [products, setProducts] = useState([]);
     const [selected, setSelected] = useState([]);
     const [sort, setSort] = useState(null);
+    const [sortOrder, setSortOrder] = useState("DESC");
     const [search, setSearch] = useState(null);
     const [hasVarients, setHasVarients] = useState(null);
     const [links, setLinks] = useState([]);
@@ -36,56 +45,125 @@ const Products = () => {
 
     const navigate = useNavigate();
 
-    useEffect(() => {
-        let params = new URLSearchParams(location.search);
-        if (search != null) {
-            params.set("search", search);
-            navigate(`?${params.toString()}`);
-        } else {
-            params.delete("search");
-            navigate(`?${params.toString()}`);
+    useLayoutEffect(() => {
+        const highlightSearch = () => {
+            const searchText = search ? search.toLowerCase() : '';
+            document.querySelectorAll("table tbody tr td").forEach((element) => {
+                const cellText = element.textContent.toLowerCase();
+                const index = cellText.indexOf(searchText);
+                if (index !== -1) {
+                    const originalText = element.textContent.substr(index, search.length);
+                    element.innerHTML = element.textContent.replace(
+                        new RegExp(originalText, 'i'),
+                        `<span class="highlight">${originalText}</span>`
+                    );
+                }
+            });
+        };
+    
+        if (products.length > 0 && search !== null && search !== "") {
+            highlightSearch();
+        }
+    }, [products, search]);
+
+    const buildQueryParams = () => {
+        const params = new URLSearchParams();
+
+        if (search !== null && search.trim() !== "") {
+            params.set("search", search.trim());
         }
 
-        const delayedFetch = debounce(() => {
-            fetchProducts(page, sort);
-        }, 300);
+        if (categoryFitler !== null) {
+            params.set("categoryFitler", categoryFitler);
+        }
 
-        delayedFetch();
-
-        return () => {
-            delayedFetch.cancel();
-            console.log("search changed finish", search);
-        };
-    }, [search]);
-
-    useEffect(() => {
-        let params = new URLSearchParams(location.search);
-        if (hasVarients != null) {
+        if (hasVarients !== null) {
             params.set("hasVarients", hasVarients);
-            navigate(`?${params.toString()}`);
-        } else {
-            params.delete("hasVarients");
-            navigate(`?${params.toString()}`);
         }
-        fetchProducts(page, sort);
 
-        return () => {
-            console.log("hasVarient changed finish", hasVarients);
-        };
-    }, [hasVarients]);
+        if (sort !== null) {
+            params.set("sort", sort);
+            params.set("order", sortOrder === "DESC" ? "ASC" : "DESC");
+        }
+
+        return params.toString();
+    };
 
     useEffect(() => {
-        let params = new URLSearchParams(location.search);
-        if (page !== 1 && typeof page === "number" && page > 0) {
-            params.set("page", page);
-            navigate(`?${params.toString()}`);
-        } else {
-            params.delete("page");
-            navigate(`?${params.toString()}`);
-        }
+        const queryParams = buildQueryParams();
+        navigate(`?${queryParams}`);
+        fetchProducts();
+    }, [search, categoryFitler, hasVarients, sort, sortOrder]);
+    // useEffect(() => {
+    //     let params = new URLSearchParams(location.search);
+    //     if (search != null) {
+    //         params.set("search", search);
+    //         navigate(`?${params.toString()}`);
+    //     } else {
+    //         params.delete("search");
+    //         navigate(`?${params.toString()}`);
+    //     }
 
-        return console.log("page changed finish", page);
-    }, [page]);
+    //     const delayedFetch = debounce(() => {
+    //         fetchProducts(page, sort);
+    //     }, 300);
+    //     search != "" && document.querySelectorAll("table tbody tr td").forEach((element) => {
+    //         if (element.textContent.includes(search)) {
+    //             element.innerHTML = element.textContent.replace(
+    //                 search,
+    //                 '<span class="highlight">' + search + "</span>"
+    //             );
+    //         }
+    //     })
+    //     delayedFetch();
+    //     return () => {
+    //         delayedFetch.cancel();
+    //         console.log("search changed finish", search);
+    //     };
+    // }, [search]);
+    // useEffect(() => {
+    //     let params = new URLSearchParams(location.search);
+    //     if (categoryFitler != null) {
+    //         params.set("categoryFitler", categoryFitler);
+    //         navigate(`?${params.toString()}`);
+    //     } else {
+    //         params.delete("categoryFitler");
+    //         navigate(`?${params.toString()}`);
+    //     }
+
+    //     fetchProducts(page, sort);
+
+    //     return () => {
+    //         console.log("categoryFitler changed finish", categoryFitler);
+    //     };
+    // }, [categoryFitler]);
+    // useEffect(() => {
+    //     let params = new URLSearchParams(location.search);
+    //     if (hasVarients != null) {
+    //         params.set("hasVarients", hasVarients);
+    //         navigate(`?${params.toString()}`);
+    //     } else {
+    //         params.delete("hasVarients");
+    //         navigate(`?${params.toString()}`);
+    //     }
+    //     fetchProducts(page, sort);
+
+    //     return () => {
+    //         console.log("hasVarient changed finish", hasVarients);
+    //     };
+    // }, [hasVarients]);
+    // useEffect(() => {
+    //     let params = new URLSearchParams(location.search);
+    //     if (page !== 1 && typeof page === "number" && page > 0) {
+    //         params.set("page", page);
+    //         navigate(`?${params.toString()}`);
+    //     } else {
+    //         params.delete("page");
+    //         navigate(`?${params.toString()}`);
+    //     }
+
+    //     return console.log("page changed finish", page);
+    // }, [page]);
 
     useEffect(() => {
         let params = new URLSearchParams(location.search);
@@ -96,6 +174,8 @@ const Products = () => {
             params.delete("sort");
             navigate(`?${params.toString()}`);
         }
+        setSortOrder(sortOrder == "DESC" ? "ASC" : "DESC");
+        params.set("order", sortOrder == "DESC" ? "ASC" : "DESC");
         return console.log("sort changed finish", sort);
     }, [sort]);
 
@@ -199,8 +279,18 @@ const Products = () => {
             param.set("hasVarients", hasVarients);
         }
 
+        param.set("order", sortOrder);
+
         if (search !== null) {
             param.set("search", search);
+        }
+
+        if (search !== null) {
+            param.set("search", search);
+        }
+
+        if (categoryFitler !== null) {
+            param.set("categoryFitler", categoryFitler);
         }
 
         paginateUrl += `?${param.toString()}`;
@@ -230,6 +320,18 @@ const Products = () => {
             });
         } else {
             CheckPoducts();
+            axios.get("api/category?type=all").then((response) => {
+                let categoriesResponse = response.data.data.map((category) => ({
+                    value: category.id,
+                    label: category.name,
+                }));
+                categoriesResponse.unshift({
+                    value: "",
+                    label: "select to filter",
+                });
+
+                setCategories(categoriesResponse);
+            });
         }
 
         return () => {
@@ -292,6 +394,19 @@ const Products = () => {
                       dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500
                        dark:focus:border-blue-500"
                         placeholder="search..."
+                    />
+                    <Select
+                        className="w-1/2"
+                        options={categories}
+                        isSearchable={true}
+                        onChange={(event) => setCategoryFitler(event.value)}
+                        styles={{
+                            control: (styles) => ({
+                                ...styles,
+                                borderRadius: "0.375rem",
+                                border: "1px solid #D1D5DB",
+                            }),
+                        }}
                     />
                     <select
                         id="countries"

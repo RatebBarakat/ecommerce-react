@@ -66,6 +66,16 @@ export default function Home() {
                   >
                     {cart.isLoading ? <Loading size={5} /> : 'Add to Cart'}
                   </button>
+                  <button
+                    className={`text-white py-2 px-4 rounded-lg ${
+                      cart.isInCart(product.id)
+                        ? "!bg-cyan-300 cursor-not-allowed"
+                        : "bg-cyan-600"
+                    } hover:bg-cyan-700`}
+                    onClick={() => navigate(`/products/details/${product.id}`)}
+                  >
+                    {cart.isLoading ? <Loading size={5} /> : 'details'}
+                  </button>
                 </div>
                 <div className="mt-4">
                   <p className="text-gray-500 font-medium">Tags:</p>

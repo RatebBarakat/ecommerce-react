@@ -7,6 +7,7 @@ import { AuthContext } from "../../../contexts/auth";
 import Toast from "../../../components/Toast";
 import createAxiosInstance from "../../../axios";
 import Select from "react-select";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function UpdateProduct() {
     const [isLoading, setIsLoading] = useState(true);
@@ -324,6 +325,8 @@ export default function UpdateProduct() {
         });
     };
 
+    function handleDeleteAttributeOption(attributeIndex, optionIndex) {}
+
     useEffect(() => {
         setProduct({ ...product, slug: product.name.replace(/\s+/g, "-") });
     }, [product.name]);
@@ -566,14 +569,11 @@ export default function UpdateProduct() {
                                         src={image.url}
                                         alt="display"
                                     />
-                                    <button
-                                        type="button"
-                                        disabled={processing}
+                                    <FontAwesomeIcon
                                         onClick={() => handleRemoveImage(image)}
-                                        className="bg-red-600 text-white px-1 mt-1 rounded disabled:bg-red-300 disabled:cursor-not-allowed"
-                                    >
-                                        x
-                                    </button>
+                                        className="text-red-500 cursor-pointer"
+                                        icon={"fa-trash"}
+                                    />
                                 </div>
                             ))}
                     </div>
@@ -659,6 +659,16 @@ export default function UpdateProduct() {
                                                                 }
                                                             >
                                                                 {option}
+                                                                <FontAwesomeIcon
+                                                                    onClick={handleDeleteAttributeOption(
+                                                                        index,
+                                                                        optionIndex
+                                                                    )}
+                                                                    className="text-red-500 cursor-pointer"
+                                                                    icon={
+                                                                        "fa-trash"
+                                                                    }
+                                                                />
                                                             </div>
                                                         )
                                                     )}
@@ -669,7 +679,13 @@ export default function UpdateProduct() {
                                 ))}
                             {varients && (
                                 <>
-                                    <div className="flex flex-wrap gap-2 w-full">
+                                    <div
+                                        className="flex flex-wrap gap-2 w-full"
+                                        style={{
+                                            gridColumnStart: "1",
+                                            gridColumnEnd: "3",
+                                        }}
+                                    >
                                         {varients.map((item, index) => (
                                             <div className="shadow p-2 ">
                                                 <Input

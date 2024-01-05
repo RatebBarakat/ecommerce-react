@@ -7,6 +7,7 @@ import { AuthContext } from "../../../contexts/auth";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import ErrorHelper from "../../../helpers/errors";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function CreateProduct() {
     const [isLoading, setIsLoading] = useState(true);
@@ -16,6 +17,7 @@ export default function CreateProduct() {
     const axios = createAxiosInstance(auth);
     const navigate = useNavigate();
     const attri = useRef(null);
+    const optionsRefs = useRef([]);
     const [tagSuggestions, setTagSuggestions] = useState([]);
     const [product, setProduct] = useState({
         name: "",
@@ -37,12 +39,18 @@ export default function CreateProduct() {
         const updatedAttributes = [...attributes];
         updatedAttributes[index].options.push(option);
         setAttributes(updatedAttributes);
+
+        const newOptionIndex = updatedAttributes[index].options.length - 1;
+        console.log(optionsRefs);
+        optionsRefs.current[index].current.value = "";
+        optionsRefs.current[index].current.focus();
     };
 
     const handleAddAttribute = (name) => {
         setAttributes([...attributes, { name: name, options: [] }]);
         attri.current.value = "";
         attri.current.focus();
+        optionsRefs.current.push(React.createRef());
     };
 
     useEffect(() => {
@@ -448,6 +456,7 @@ export default function CreateProduct() {
                                                     <input
                                                         type="text"
                                                         value={optionsInput}
+                                                        ref={optionsRefs}
                                                         onChange={(e) =>
                                                             setOptionsInput(
                                                                 e.target.value
@@ -470,32 +479,43 @@ export default function CreateProduct() {
                                                         Add Option
                                                     </button>
                                                 </div>
-                                                {attribute.options &&
+                                                {attribute.options && (
                                                     <div className="flex gap-2">
                                                         {attribute.options.map(
-                                                        (
-                                                            option,
-                                                            optionIndex
-                                                        ) => (
-                                                            <div
-                                                                className="border border-blue-500 rounded p-2 text-blue-500 w-fit"
-                                                                key={
-                                                                    optionIndex
-                                                                }
-                                                            >
-                                                                {option}
-                                                            </div>
-                                                        )
-                                                    )}
+                                                            (
+                                                                option,
+                                                                optionIndex
+                                                            ) => (
+                                                                <div
+                                                                    className="border border-blue-500 rounded p-2 text-blue-500 w-fit"
+                                                                    key={
+                                                                        optionIndex
+                                                                    }
+                                                                >
+                                                                    {option}{" "}
+                                                                    <FontAwesomeIcon
+                                                                        icon={
+                                                                            "fa-trash"
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                            )
+                                                        )}
                                                     </div>
-                                                }
+                                                )}
                                             </div>
                                         </div>
                                     ))}
                             </div>
                             {varients && (
                                 <>
-                                    <div className="flex flex-wrap gap-2 w-full">
+                                    <div
+                                        className="flex flex-wrap gap-2 w-full"
+                                        style={{
+                                            gridColumnStart: "1",
+                                            gridColumnEnd: "3",
+                                        }}
+                                    >
                                         {varients.map((item, index) => (
                                             <div className="shadow p-2 ">
                                                 <Input
