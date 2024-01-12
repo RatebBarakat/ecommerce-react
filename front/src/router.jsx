@@ -1,6 +1,4 @@
-import {
-    createBrowserRouter,
-  } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import Home from "./views/Home";
 import GuestLayout from "./layouts/GuestLayout";
 import AuthLayout from "./layouts/AuthLayout";
@@ -21,97 +19,96 @@ import Cart from "./views/cart";
 import ProductDetail from "./views/productDetail";
 
 const router = createBrowserRouter([
-    {
-        path: '/',
-        element: <GuestLayout />,
-        children: [
-            {
-                path: 'login',
-                element: <Login />
-            },
-            {
-                path: '/',
-                element: <Home />
-            },
-            {
-                path: 'products/details/:id',
-                element: <ProductDetail />
-            },
-            {
-                path: 'register',
-                element: <Register />
-            },
-            {
-                path: 'forgot-password',
-                element: <ForgotPassword />
-            },
-            {
-                path: 'password-reset',
-                element: <ResetPassword />
-            },
-        ]
-    },
-    {
-        path: '/admin',
-        element: <AdminLayout />,
-        children: [
-            {
-                path: 'dashboard',
-                element: <Dashboard />
-            },
-            {
-                path: 'categories',
-                element: <Categories />
-            },
-            {
-                path: 'products',
-                element: <Products />
-            },
-            {
-                path: 'tags',
-                element: <Tags />
-            },
-            {
-                path: 'products/create',
-                element: <CreateProduct />
-            },
-            {
-                path: 'products/edit/:id',
-                element: <Updateproduct />
-            },
-            {
-                path: 'profile',
-                element: <Profile />
-            },
-            {
-                path: 'verify',
-                element: <VerifyEmail />
-            },
-        ]
-    },
-    {
-        path: '/user',
-        element: <AuthLayout />,
-        children: [
-            {
-                path: 'dashboard',
-                element: <Dashboard />
-            },
-            {
-                path: 'profile',
-                element: <Profile />
-            },
-            {
-                path: 'verify',
-                element: <VerifyEmail />
-            },
-            {
-                path: 'cart',
-                element: <Cart />
-            },
-        ]
-    },
+  {
+    path: "/",
+    element: <GuestLayout />,
+    children: [
+      {
+        path: "login",
+        element: <Login />,
+      },
+      {
+        path: "/",
+        element: <Home />,
+      },
+      {
+        path: "products/details/:id",
+        element: <ProductDetail />,
+      },
+      {
+        path: "register",
+        element: <Register />,
+      },
+      {
+        path: "forgot-password",
+        element: <ForgotPassword />,
+      },
+      {
+        path: "password-reset",
+        element: <ResetPassword />,
+      },
+    ],
+  },
+  {
+    path: "/admin",
+    element: <AdminLayout />,
+    children: [
+      {
+        path: "dashboard",
+        element: <Dashboard />,
+      },
+      {
+        path: "categories",
+        element: <Categories />,
+      },
+      {
+        path: "products",
+        element: <Products />,
+      },
+      {
+        path: "tags",
+        element: <Tags />,
+      },
+      {
+        path: "products/create",
+        element: <CreateProduct />,
+      },
+      {
+        path: "products/edit/:id",
+        element: <Updateproduct />,
+      },
+      {
+        path: "profile",
+        element: <Profile />,
+      },
+      {
+        path: "verify",
+        element: <VerifyEmail />,
+      },
+    ],
+  },
+  {
+    path: "/user",
+    element: <AuthLayout />,
+    children: [
+      {
+        path: "dashboard",
+        element: <Dashboard />,
+      },
+      {
+        path: "profile",
+        element: <Profile />,
+      },
+      {
+        path: "verify",
+        element: <VerifyEmail />,
+      },
+      {
+        path: "cart",
+        element: <Cart />,
+      },
+    ],
+  },
 ]);
 
 export default router;
-

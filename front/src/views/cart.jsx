@@ -65,9 +65,7 @@ const Cart = () => {
                       }
                     />
                   </td>
-                  <td className="py-2">
-                    {item.quantity * item.product.price}
-                  </td>
+                  <td className="py-2">{item.quantity * item.product.price}</td>
                   <td className="py-2">
                     {updatingItem.id == item.id &&
                       updatingItem.quantity != item.quantity && (

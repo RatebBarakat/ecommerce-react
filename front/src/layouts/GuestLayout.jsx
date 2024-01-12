@@ -5,18 +5,18 @@ import Loading from "../components/Loading";
 import Header from "../components/Header";
 
 export default function GuestLayout() {
-    const auth = useContext(AuthContext);
+  const auth = useContext(AuthContext);
 
-    return auth.isLoading ? (
-        <Loading centered={true} size={"large"} />
-    ) : auth.user ? (
-        <Navigate
-            to={auth.isAdmin === false ? "/user/dashboard" : "/admin/dashboard"}
-        />
-    ) : (
-        <>
-            <Header />
-            <Outlet />
-        </>
-    );
+  return auth.isLoading ? (
+    <Loading centered={true} size={"large"} />
+  ) : auth.user ? (
+    <Navigate
+      to={auth.isAdmin === false ? "/user/dashboard" : "/admin/dashboard"}
+    />
+  ) : (
+    <>
+      <Header />
+      <Outlet />
+    </>
+  );
 }

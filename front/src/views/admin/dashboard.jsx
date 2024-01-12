@@ -26,9 +26,9 @@ export default function Dashboard() {
   const auth = useContext(AuthContext);
   const axios = createAxiosInstance(auth);
   const [counts, setCounts] = useState([
-    {categories : 0},
-    {products : 0},
-    {tags : 0},
+    { categories: 0 },
+    { products: 0 },
+    { tags: 0 },
   ]);
 
   const dashboardLinks = [
@@ -37,28 +37,28 @@ export default function Dashboard() {
       route: "/admin/categories",
       text: "Categories",
       bg: "bg-red-600",
-      count : counts['categories']
+      count: counts["categories"],
     },
     {
       permission: "read-products",
       route: "/admin/products",
       text: "Products",
       bg: "bg-blue-600",
-      count : counts['products']
+      count: counts["products"],
     },
     {
       permission: "read-tags",
       route: "/admin/tags",
       text: "Tags",
       bg: "bg-green-600",
-      count : counts['tags']
+      count: counts["tags"],
     },
     {
       permission: "read-roles",
       route: "/admin/roles",
       text: "Roles",
       bg: "bg-yellow-600",
-      count : 0
+      count: 0,
     },
   ];
 
@@ -73,7 +73,7 @@ export default function Dashboard() {
       <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {dashboardLinks.map(
-          ({ permission, route, text, bg,count }) =>
+          ({ permission, route, text, bg, count }) =>
             Permission.can(auth, permission) && (
               <DashboardLink
                 key={permission}
