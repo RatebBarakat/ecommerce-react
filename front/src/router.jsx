@@ -23,19 +23,19 @@ import ProductDetail from "./views/productDetail";
 const router = createBrowserRouter([
     {
         path: '/',
-        element: <Home />
-    },
-    {
-        path: 'products/details/:id',
-        element: <ProductDetail />
-    },
-    {
-        path: '/',
         element: <GuestLayout />,
         children: [
             {
                 path: 'login',
                 element: <Login />
+            },
+            {
+                path: '/',
+                element: <Home />
+            },
+            {
+                path: 'products/details/:id',
+                element: <ProductDetail />
             },
             {
                 path: 'register',
